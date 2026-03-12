@@ -2,89 +2,105 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wicked | Roblox Musical System</title>
+    <title>Wicked Admin & Support System</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --wicked-green: #97d72e; --dark: #0a0a0a; --gray: #333; }
-        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; }
+        :root { --wicked-green: #97d72e; --dark: #111; --border: #333; }
+        body { margin: 0; background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; }
+        nav { padding: 15px 50px; background: #000; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; }
+        .card { background: var(--dark); padding: 20px; border-radius: 10px; border: 1px solid var(--border); }
         
-        /* Layout */
-        nav { padding: 20px; background: #000; display: flex; justify-content: space-between; border-bottom: 1px solid var(--gray); }
-        .container { max-width: 1200px; margin: 20px auto; display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 20px; }
-        .card { background: #111; padding: 20px; border-radius: 8px; border: 1px solid var(--gray); }
-        
-        /* Kalender */
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--gray); }
-        .day { min-height: 80px; border: 1px solid var(--gray); padding: 5px; position: relative; }
-        .show-btn { background: var(--wicked-green); color: #000; border: none; font-size: 10px; width: 100%; cursor: pointer; margin-top: 5px; font-weight: bold; }
-        
-        /* Seating Chart */
-        .seating-chart { display: grid; grid-template-columns: repeat(10, 30px); gap: 5px; justify-content: center; margin-top: 20px; }
-        .seat { width: 30px; height: 30px; background: var(--wicked-green); border-radius: 4px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; color: #000; }
-        .seat.taken { background: #444; cursor: not-allowed; color: #888; }
-        .seat.blocked { background: #ff4444; cursor: not-allowed; }
-        .screen { width: 200px; height: 10px; background: #fff; margin: 10px auto; text-align: center; color: #000; font-size: 8px; }
+        /* Kalender & Shows */
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--border); }
+        .day { min-height: 90px; border: 1px solid var(--border); padding: 10px; cursor: pointer; transition: 0.3s; }
+        .day:hover { background: #1a1a1a; }
+        .has-show { border-bottom: 3px solid var(--wicked-green); }
 
-        /* Admin & Auth */
-        #admin-panel, #auth-box, #booking-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 2px solid var(--wicked-green); display: none; z-index: 100; width: 400px; max-height: 80vh; overflow-y: auto; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid var(--gray); color: #fff; }
-        .admin-btn { color: gold; font-weight: bold; cursor: pointer; }
+        /* Modals */
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 2px solid var(--wicked-green); display: none; z-index: 1000; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 900; }
+        
+        /* Seating */
+        .seating { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; margin: 20px 0; }
+        .seat { aspect-ratio: 1; background: var(--wicked-green); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #000; }
+        .seat.taken { background: #444; color: #888; cursor: not-allowed; }
+
+        /* UI Elements */
+        input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid var(--border); color: #fff; border-radius: 5px; }
+        .btn { background: var(--wicked-green); color: #000; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        .admin-only { color: gold; font-weight: bold; cursor: pointer; }
+        .support-user { background: #222; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid var(--wicked-green); }
     </style>
 </head>
 <body>
 
 <nav>
-    <div style="font-weight: bold;">WICKED <span style="color: var(--wicked-green);">ROBLOX</span></div>
+    <div style="font-size: 24px; font-weight: bold;">WICKED <span style="color: var(--wicked-green);">PRODUCTIONS</span></div>
     <div>
-        <span id="admin-link" class="admin-btn" style="display:none; margin-right: 20px;" onclick="showAdmin()">ADMIN PANEEL</span>
-        <span id="auth-btn" style="cursor:pointer;" onclick="showAuth()">INLOGGEN</span>
+        <span id="admin-link" class="admin-only" style="display:none; margin-right:20px;" onclick="openAdmin()">ADMIN & SUPPORT</span>
+        <span id="login-btn" onclick="openAuth()" style="cursor:pointer">INLOGGEN</span>
     </div>
 </nav>
 
 <div class="container">
     <aside>
         <div class="card">
-            <h3 id="user-name">Welkom</h3>
-            <div id="user-tickets">Log in om je tickets te zien.</div>
+            <h3 id="display-name">Welkom Bezoeker</h3>
+            <div id="my-tickets">Je hebt nog geen tickets.</div>
         </div>
     </aside>
     <main class="card">
         <h2>Speelschema Maart 2026</h2>
+        <p style="font-size: 12px; color: #888;">Klik op een dag voor show-informatie en tickets.</p>
         <div class="calendar" id="calendar"></div>
     </main>
 </div>
 
-<div id="auth-box">
-    <h3>Inloggen / Registreren</h3>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="pass" placeholder="Wachtwoord">
-    <button class="show-btn" onclick="handleAuth()">BEVESTIG</button>
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<div class="modal" id="show-modal">
+    <h2 id="modal-date">Show Info</h2>
+    <div id="show-content">
+        <p><strong>Cast:</strong> <span id="modal-cast">Geen show gepland.</span></p>
+        <div id="booking-section" style="display:none;">
+            <h4>Kies een stoel:</h4>
+            <div class="seating" id="seating-grid"></div>
+        </div>
+    </div>
 </div>
 
-<div id="booking-box">
-    <h3>Kies je stoel</h3>
-    <div class="screen">PODIUM</div>
-    <div class="seating-chart" id="seating-chart"></div>
-    <button class="show-btn" style="margin-top:20px; background:#444; color:#fff;" onclick="this.parentElement.style.display='none'">SLUITEN</button>
+<div class="modal" id="admin-modal">
+    <h2>Admin Dashboard</h2>
+    <div style="border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px;">
+        <button class="btn" onclick="toggleAdminTab('shows')">Show Beheer</button>
+        <button class="btn" style="background:#444; color:white; margin-top:5px;" onclick="toggleAdminTab('support')">Support (Users)</button>
+    </div>
+
+    <div id="tab-shows">
+        <h3>Show Plannen</h3>
+        <input type="number" id="adm-day" placeholder="Dag van de maand">
+        <input type="text" id="adm-time" placeholder="Tijd (bijv. 19:30)">
+        <textarea id="adm-cast" placeholder="Cast lijst (bijv. Elphaba: Naam, Glinda: Naam)"></textarea>
+        <button class="btn" onclick="saveShow()">SHOW OPSLAAN</button>
+    </div>
+
+    <div id="tab-support" style="display:none;">
+        <h3>Gebruikers Beheren</h3>
+        <div id="user-list">Laden...</div>
+    </div>
 </div>
 
-<div id="admin-panel">
-    <h3>Admin Beheer</h3>
-    <p><b>Show Toevoegen:</b></p>
-    <input type="number" id="new-day" placeholder="Dag van de maand (1-31)">
-    <input type="text" id="new-time" placeholder="Tijd (bijv. 19:30)">
-    <button class="show-btn" onclick="addShow()">VOEG SHOW TOE</button>
-    <hr>
-    <p><b>Geblokkeerde Stoelen:</b> (Nummers bijv: 1,2,5)</p>
-    <input type="text" id="blocked-seats" placeholder="Stoelnummers">
-    <button class="show-btn" onclick="saveSettings()">INSTELLINGEN OPSLAAN</button>
+<div class="modal" id="auth-modal">
+    <h3>Account</h3>
+    <input type="email" id="auth-email" placeholder="Email">
+    <input type="password" id="auth-pass" placeholder="Wachtwoord">
+    <button class="btn" onclick="handleAuth()">LOG IN / REGISTREER</button>
 </div>
 
 <script>
-    // JOUW FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyC6NE5hOdVdRc1JJuxe5jbyT7LLaXJi84o",
         authDomain: "wickeddemusical.firebaseapp.com",
@@ -97,116 +113,157 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const ADMIN_EMAIL = "JOUW_EMAIL@GMAIL.COM"; // PAS DIT AAN NAAR JOUW EMAIL
+    const ADMIN_EMAIL = "jouwemail@gmail.com"; // VERANDER DIT
 
-    let selectedShow = null;
+    let currentShowId = null;
 
-    // Auth
-    function showAuth() { document.getElementById('auth-box').style.display = 'block'; }
-    async function handleAuth() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-        } catch(e) {
-            await auth.createUserWithEmailAndPassword(email, pass);
-        }
-        location.reload();
-    }
-
-    auth.onAuthStateChanged(async user => {
+    // Core Init
+    auth.onAuthStateChanged(user => {
         if(user) {
-            document.getElementById('auth-box').style.display = 'none';
-            document.getElementById('auth-btn').innerText = "UITLOGGEN";
-            document.getElementById('auth-btn').onclick = () => auth.signOut().then(() => location.reload());
-            document.getElementById('user-name').innerText = user.email;
+            document.getElementById('display-name').innerText = user.email;
+            document.getElementById('login-btn').innerText = "UITLOGGEN";
+            document.getElementById('login-btn').onclick = () => auth.signOut().then(()=>location.reload());
             if(user.email === ADMIN_EMAIL) document.getElementById('admin-link').style.display = 'inline';
-            loadUserTickets(user.uid);
+            loadMyTickets(user.uid);
         }
-        loadShows();
+        renderCalendar();
     });
 
-    // Shows laden
-    async function loadShows() {
+    // Calendar & Show Info
+    async function renderCalendar() {
         const snap = await db.collection('shows').get();
-        const grid = document.getElementById('calendar');
-        grid.innerHTML = '';
         const shows = {};
-        snap.forEach(doc => { shows[doc.data().day] = {id: doc.id, ...doc.data()}; });
-
-        for(let i=1; i<=31; i++) {
-            let html = `<div class="day"><span>${i}</span>`;
-            if(shows[i]) {
-                html += `<button class="show-btn" onclick="openBooking('${shows[i].id}', ${i})">${shows[i].time}</button>`;
-            }
-            grid.innerHTML += html + `</div>`;
-        }
-    }
-
-    // Booking & Stoelen
-    async function openBooking(showId, day) {
-        selectedShow = showId;
-        document.getElementById('booking-box').style.display = 'block';
-        const chart = document.getElementById('seating-chart');
-        chart.innerHTML = '';
+        snap.forEach(doc => shows[doc.data().day] = {id: doc.id, ...doc.data()});
         
-        const showDoc = await db.collection('shows').doc(showId).get();
-        const takenSeats = showDoc.data().takenSeats || [];
-        const settings = await db.collection('settings').doc('global').get();
-        const blockedSeats = settings.data().blockedSeats || [];
-
-        for(let i=1; i<=50; i++) {
-            let status = '';
-            if(takenSeats.includes(i)) status = 'taken';
-            if(blockedSeats.includes(i)) status = 'blocked';
-            
-            chart.innerHTML += `<div class="seat ${status}" onclick="bookSeat(${i}, '${status}')">${i}</div>`;
+        const cal = document.getElementById('calendar');
+        cal.innerHTML = '';
+        for(let i=1; i<=31; i++) {
+            const hasShow = shows[i] ? 'has-show' : '';
+            cal.innerHTML += `<div class="day ${hasShow}" onclick="openShow(${i}, '${shows[i]?.id || ''}')">${i}</div>`;
         }
     }
 
-    async function bookSeat(num, status) {
-        if(status !== '') return alert("Deze stoel is niet beschikbaar.");
+    async function openShow(day, id) {
+        currentShowId = id;
+        document.getElementById('overlay').style.display = 'block';
+        const modal = document.getElementById('show-modal');
+        modal.style.display = 'block';
+        document.getElementById('modal-date').innerText = day + " Maart 2026";
+        
+        if(!id) {
+            document.getElementById('modal-cast').innerText = "Geen show gepland op deze dag.";
+            document.getElementById('booking-section').style.display = 'none';
+            return;
+        }
+
+        const doc = await db.collection('shows').doc(id).get();
+        const data = doc.data();
+        document.getElementById('modal-cast').innerText = data.cast || "Nog niet bekend";
+        document.getElementById('booking-section').style.display = 'block';
+        renderSeats(data.takenSeats || []);
+    }
+
+    function renderSeats(taken) {
+        const grid = document.getElementById('seating-grid');
+        grid.innerHTML = '';
+        for(let i=1; i<=50; i++) {
+            const isTaken = taken.includes(i);
+            grid.innerHTML += `<div class="seat ${isTaken ? 'taken' : ''}" onclick="bookSeat(${i}, ${isTaken})">${i}</div>`;
+        }
+    }
+
+    async function bookSeat(num, isTaken) {
+        if(isTaken) return;
         const user = auth.currentUser;
         if(!user) return alert("Log eerst in!");
-
-        await db.collection('shows').doc(selectedShow).update({
+        
+        await db.collection('shows').doc(currentShowId).update({
             takenSeats: firebase.firestore.FieldValue.arrayUnion(num)
         });
         
         await db.collection('users').doc(user.uid).collection('tickets').add({
-            showId: selectedShow,
             seat: num,
-            date: "Maart 2026"
+            showId: currentShowId,
+            date: document.getElementById('modal-date').innerText
         });
-
-        alert("Stoel " + num + " gereserveerd!");
+        
+        alert("Gereserveerd!");
         location.reload();
     }
 
-    // Admin functies
-    function showAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
-    async function addShow() {
-        const day = parseInt(document.getElementById('new-day').value);
-        const time = document.getElementById('new-time').value;
-        await db.collection('shows').add({ day, time, takenSeats: [] });
+    // Admin & Support Logic
+    function openAdmin() {
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('admin-modal').style.display = 'block';
+        loadUsers();
+    }
+
+    async function saveShow() {
+        const day = parseInt(document.getElementById('adm-day').value);
+        const time = document.getElementById('adm-time').value;
+        const cast = document.getElementById('adm-cast').value;
+        await db.collection('shows').add({ day, time, cast, takenSeats: [] });
         alert("Show toegevoegd!");
         location.reload();
     }
 
-    async function saveSettings() {
-        const blocked = document.getElementById('blocked-seats').value.split(',').map(Number);
-        await db.collection('settings').doc('global').set({ blockedSeats: blocked });
-        alert("Instellingen opgeslagen!");
+    async function loadUsers() {
+        const snap = await db.collection('users').get();
+        const list = document.getElementById('user-list');
+        list.innerHTML = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            list.innerHTML += `
+                <div class="support-user">
+                    <b>${u.email}</b><br>
+                    <button class="btn" style="padding:5px; margin-top:5px;" onclick="manualTicket('${doc.id}')">+ Ticket Toevoegen</button>
+                </div>`;
+        });
+    }
+
+    async function manualTicket(uid) {
+        const seat = prompt("Welk stoelnummer?");
+        const show = prompt("Welke dag (getal 1-31)?");
+        // Dit is een versimpelde support actie
+        await db.collection('users').doc(uid).collection('tickets').add({
+            seat: parseInt(seat),
+            date: show + " Maart (Support toegevoegd)"
+        });
+        alert("Ticket handmatig toegevoegd aan account!");
+    }
+
+    // Helpers
+    function closeAll() {
+        document.querySelectorAll('.modal, .overlay').forEach(el => el.style.display = 'none');
+    }
+
+    function toggleAdminTab(tab) {
+        document.getElementById('tab-shows').style.display = tab === 'shows' ? 'block' : 'none';
+        document.getElementById('tab-support').style.display = tab === 'support' ? 'block' : 'none';
+    }
+
+    function openAuth() { document.getElementById('overlay').style.display='block'; document.getElementById('auth-modal').style.display='block'; }
+
+    async function handleAuth() {
+        const e = document.getElementById('auth-email').value;
+        const p = document.getElementById('auth-pass').value;
+        try { await auth.signInWithEmailAndPassword(e, p); }
+        catch { 
+            const res = await auth.createUserWithEmailAndPassword(e, p); 
+            await db.collection('users').doc(res.user.uid).set({email: e});
+        }
         location.reload();
     }
 
-    async function loadUserTickets(uid) {
+    async function loadMyTickets(uid) {
         const snap = await db.collection('users').doc(uid).collection('tickets').get();
-        const div = document.getElementById('user-tickets');
-        if(snap.empty) div.innerText = "Geen tickets."; else div.innerHTML = '';
-        snap.forEach(doc => {
-            div.innerHTML += `<div style="font-size:12px; margin-bottom:5px; color:var(--wicked-green)">🎟️ Stoel ${doc.data().seat}</div>`;
-        });
+        const div = document.getElementById('my-tickets');
+        if(!snap.empty) {
+            div.innerHTML = '';
+            snap.forEach(doc => {
+                div.innerHTML += `<div style="color:var(--wicked-green); font-size:13px; margin-bottom:5px;">🎟️ Stoel ${doc.data().seat} (${doc.data().date})</div>`;
+            });
+        }
     }
 </script>
 
