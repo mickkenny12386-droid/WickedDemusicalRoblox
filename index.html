@@ -1,216 +1,180 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wicked | Official Booking</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+<style>
+    /* ... (bestaande navigatie en hero stijlen blijven gelijk) ... */
+
+    .theater-container {
+        position: relative;
+        width: 800px;
+        height: 650px;
+        margin: 0 auto;
+        background: #050505;
+        border-radius: 50% 50% 0 0;
+        overflow: hidden;
+        padding-top: 50px;
+    }
+
+    .podium-box {
+        width: 200px;
+        background: white;
+        color: black;
+        font-weight: bold;
+        text-align: center;
+        padding: 10px;
+        margin: 0 auto 40px;
+        letter-spacing: 5px;
+        z-index: 10;
+        position: relative;
+    }
+
+    /* Stoel styling */
+    .seat {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .seat:hover {
+        transform: scale(1.5) !important;
+        box-shadow: 0 0 8px white;
+        z-index: 100;
+    }
+
+    .seat.selected {
+        border: 2px solid white;
+        box-shadow: 0 0 10px var(--emerald);
+    }
+
+    .seat.taken {
+        background: #333 !important;
+        cursor: not-allowed;
+    }
+
+    /* Kleuren uit je afbeelding */
+    .s1 { background: #ffd700; } /* Geel */
+    .s2 { background: #007bff; } /* Blauw */
+    .s3 { background: #dc3545; } /* Rood */
+
+    .booking-panel {
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px solid #333;
+        padding-top: 20px;
+    }
+</style>
+
+<div class="modal" id="book-modal">
+    <div class="theater-container" id="theater-arena">
+        <div class="podium-box">PODIUM</div>
+        </div>
     
-    <style>
-        :root {
-            --emerald: #97d72e;
-            --witch-black: #0a0a0a;
-            --lvl1: #ffd700; /* Geel */
-            --lvl2: #007bff; /* Blauw */
-            --lvl3: #dc3545; /* Rood */
-        }
-
-        body { margin: 0; background: var(--witch-black); color: white; font-family: 'Montserrat', sans-serif; }
-
-        /* Nav & Hero */
-        nav { background: rgba(0,0,0,0.95); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--emerald); }
-        .logo { font-family: 'Cinzel', serif; font-size: 24px; letter-spacing: 3px; }
-        .hero { height: 300px; background: linear-gradient(rgba(0,0,0,0.6), var(--witch-black)), url('https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg'); background-size: cover; display: flex; align-items: center; justify-content: center; text-align: center; }
-
-        /* Hoofd Layout */
-        .main-grid { max-width: 1400px; margin: -50px auto 50px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; padding: 0 20px; }
-        .glass-card { background: rgba(15, 15, 15, 0.98); border: 1px solid var(--emerald); border-radius: 15px; padding: 25px; }
-
-        /* Kalender (Zichtbaar voor iedereen) */
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .day { aspect-ratio: 1; border: 1px solid #222; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 5px; transition: 0.3s; }
-        .day.active { cursor: pointer; border-color: var(--emerald); }
-        .day.active:hover { background: rgba(151, 215, 46, 0.1); }
-
-        /* HET SEATING PLAN (Horizontaal) */
-        .theater-layout { display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; }
-        .podium { width: 300px; background: white; color: black; font-weight: bold; text-align: center; padding: 10px; margin-bottom: 30px; letter-spacing: 5px; }
-        
-        .main-seating { display: flex; justify-content: center; align-items: flex-start; gap: 30px; }
-        
-        .side-block { display: flex; flex-direction: column; gap: 4px; margin-top: 60px; }
-        .center-block { display: flex; flex-direction: column; gap: 4px; }
-        .back-block { margin-top: 40px; display: flex; flex-direction: column; gap: 4px; align-items: center; }
-
-        .row { display: flex; gap: 3px; justify-content: center; }
-        .seat { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .s1 { background: var(--lvl1); } /* Geel */
-        .s2 { background: var(--lvl2); } /* Blauw */
-        .s3 { background: var(--lvl3); } /* Rood */
-        .seat.taken { background: #444 !important; cursor: not-allowed; }
-
-        /* Modal styling */
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0a0a0a; border: 2px solid var(--emerald); z-index: 1000; width: 95%; max-width: 1100px; border-radius: 20px; padding: 30px; max-height: 90vh; overflow-y: auto; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 900; }
-        
-        .btn { background: var(--emerald); color: black; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
-    </style>
-</head>
-<body>
-
-    <div class="overlay" id="overlay" onclick="closeAll()"></div>
-
-    <nav>
-        <div class="logo">WICKED ROBLOX</div>
-        <div class="nav-links">
-            <button id="admin-btn" style="display:none; background: gold; border:none; padding: 8px; margin-right: 10px; cursor:pointer;" onclick="openAdmin()">WITCH MASTER</button>
-            <button class="btn" id="login-nav" onclick="openModal('auth-modal')">LOGIN</button>
-        </div>
-    </nav>
-
-    <div class="hero">
-        <h1>MARCH 2026</h1>
+    <div class="booking-panel">
+        <p id="selected-info">Geen stoel geselecteerd</p>
+        <button class="btn" id="confirm-btn" disabled onclick="processBooking()">RESERVEER NU</button>
+        <button class="btn" style="background:#222; color:white;" onclick="closeAll()">ANNULEREN</button>
     </div>
+</div>
 
-    <div class="main-grid">
-        <aside>
-            <div class="glass-card">
-                <h3 id="user-title">Gastenlijst</h3>
-                <div id="user-tickets">Log in om te boeken.</div>
-            </div>
-        </aside>
+<script>
+    let selectedSeatId = null;
 
-        <main class="glass-card">
-            <h2>SPEELSCHEMA MAART</h2>
-            <div class="calendar" id="calendar"></div>
-        </main>
-    </div>
+    function buildSeating() {
+        const arena = document.getElementById('theater-arena');
+        // Verwijder oude stoelen behalve het podium
+        const seats = arena.querySelectorAll('.seat');
+        seats.forEach(s => s.remove());
 
-    <div class="modal" id="book-modal">
-        <div class="theater-layout">
-            <div class="podium">PODIUM</div>
-            
-            <div class="main-seating">
-                <div class="side-block" id="left-side"></div>
-                <div class="center-block" id="center-main"></div>
-                <div class="side-block" id="right-side"></div>
-            </div>
+        const centerX = 400; // Midden van de container
+        const centerY = 50;  // Startpunt boog (bij het podium)
 
-            <div class="back-block" id="back-ring"></div>
-        </div>
-    </div>
+        // we bouwen 25 rijen in een boogvorm
+        for (let row = 1; row <= 25; row++) {
+            const radius = 100 + (row * 18); // Elke rij staat verder weg
+            const seatCount = 15 + (row * 1.5); // Meer stoelen in de achterste rijen
+            const angleStep = (Math.PI * 0.8) / seatCount; // Hoe breed de boog is
+            const startAngle = Math.PI * 1.1; 
 
-    <div class="modal" id="auth-modal" style="width: 300px;">
-        <input type="email" id="auth-email" placeholder="Email" style="width:90%; margin-bottom:10px; padding:10px;">
-        <input type="password" id="auth-pass" placeholder="Wachtwoord" style="width:90%; margin-bottom:10px; padding:10px;">
-        <button class="btn" onclick="handleAuth()">BETREED OZ</button>
-    </div>
+            for (let i = 0; i < seatCount; i++) {
+                const angle = startAngle + (i * angleStep);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
 
-    <script>
-        // FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyCCm6vZCE1KH1SnclU7NHF2BmeOUW_suio",
-            authDomain: "wickedrobloxofficial.firebaseapp.com",
-            projectId: "wickedrobloxofficial",
-            storageBucket: "wickedrobloxofficial.firebasestorage.app",
-            messagingSenderId: "107452125942",
-            appId: "1:107452125942:web:ca9c1222469fa41b1992d7"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        let activeShowId = null;
-
-        // AUTH & SHOWS LADEN
-        auth.onAuthStateChanged(user => {
-            if(user) {
-                document.getElementById('login-nav').innerText = "LOGOUT";
-                if(user.email === "virtual@gmail.com") document.getElementById('admin-btn').style.display = 'inline';
+                const seat = document.createElement('div');
+                const seatId = `R${row}S${i}`;
+                
+                // Bepaal kleur op basis van rij (zoals op de plattegrond)
+                let type = 's1';
+                if (row > 22) type = 's3'; // Achterste rijen rood
+                else if (i < 3 || i > seatCount - 4) type = 's2'; // Zijkanten blauw
+                
+                seat.className = `seat ${type}`;
+                seat.style.left = `${x}px`;
+                seat.style.top = `${y}px`;
+                seat.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+                
+                seat.onclick = () => selectSeat(seat, seatId);
+                arena.appendChild(seat);
             }
-            renderCalendar(); // Deze functie staat nu BUITEN de user check zodat iedereen shows ziet
-        });
+        }
+    }
 
-        async function renderCalendar() {
-            const cal = document.getElementById('calendar');
-            cal.innerHTML = 'Laden...';
+    function selectSeat(element, id) {
+        if (element.classList.contains('taken')) return;
+
+        // Reset vorige selectie
+        const prev = document.querySelector('.seat.selected');
+        if (prev) prev.classList.remove('selected');
+
+        element.classList.add('selected');
+        selectedSeatId = id;
+        document.getElementById('selected-info').innerText = `Geselecteerde stoel: ${id}`;
+        document.getElementById('confirm-btn').disabled = false;
+    }
+
+    async function processBooking() {
+        if (!auth.currentUser) return alert("Je moet ingelogd zijn om te reserveren.");
+        
+        try {
+            // Update Firestore
+            await db.collection('shows').doc(activeShowId).update({
+                takenSeats: firebase.firestore.FieldValue.arrayUnion(selectedSeatId)
+            });
             
-            // Haal shows op uit Firestore
+            alert("Magisch! Je stoel is gereserveerd.");
+            closeAll();
+            renderCalendar();
+        } catch (error) {
+            console.error("Booking error:", error);
+            alert("Er ging iets mis met de spreuk. Probeer het opnieuw.");
+        }
+    }
+
+    // Zorg dat de shows zichtbaar blijven voor iedereen
+    async function renderCalendar() {
+        const cal = document.getElementById('calendar');
+        cal.innerHTML = 'Magie wordt geladen...';
+        
+        try {
             const snap = await db.collection('shows').orderBy('day').get();
-            const shows = {};
-            snap.forEach(doc => shows[doc.data().day] = {id: doc.id, ...doc.data()});
-            
             cal.innerHTML = '';
-            for(let i=1; i<=31; i++) {
-                const s = shows[i];
-                cal.innerHTML += `
-                    <div class="day ${s ? 'active' : ''}" onclick="${s ? `openBooking('${s.id}')` : ''}">
-                        <span style="font-size:12px;">${i}</span>
-                        ${s ? `<b style="color:var(--emerald); font-size:10px;">${s.time}</b>` : ''}
-                    </div>`;
-            }
-        }
-
-        function openBooking(id) {
-            activeShowId = id;
-            buildSeating();
-            openModal('book-modal');
-        }
-
-        // SEATING PLAN GENERATOR (Horizontaal)
-        function buildSeating() {
-            const left = document.getElementById('left-side');
-            const center = document.getElementById('center-main');
-            const right = document.getElementById('right-side');
-            const back = document.getElementById('back-ring');
-
-            left.innerHTML = ''; center.innerHTML = ''; right.innerHTML = ''; back.innerHTML = '';
-
-            // Middenblok (Geel - Price Level 1)
-            for(let r=0; r<20; r++) {
-                const row = document.createElement('div'); row.className = 'row';
-                for(let s=0; s<18; s++) row.innerHTML += `<div class="seat s1" onclick="bookSeat(${r*100+s})"></div>`;
-                center.appendChild(row);
-            }
-
-            // Zijblokken (Blauw/Geel - Price Level 2/1)
-            for(let r=0; r<12; r++) {
-                const rowL = document.createElement('div'); rowL.className = 'row';
-                const rowR = document.createElement('div'); rowR.className = 'row';
-                for(let s=0; s<5; s++) {
-                    rowL.innerHTML += `<div class="seat ${s<2 ? 's2' : 's1'}" onclick="bookSeat(${r*10+s})"></div>`;
-                    rowR.innerHTML += `<div class="seat ${s>2 ? 's2' : 's1'}" onclick="bookSeat(${r*50+s})"></div>`;
+            
+            // Bouw de kalenderdagen 1 t/m 31
+            for (let i = 1; i <= 31; i++) {
+                const show = snap.docs.find(d => d.data().day == i);
+                const dayEl = document.createElement('div');
+                dayEl.className = `day ${show ? 'active' : ''}`;
+                
+                if (show) {
+                    dayEl.innerHTML = `<span style="font-size:12px;">${i}</span><b style="color:var(--emerald); font-size:10px;">${show.data().time}</b>`;
+                    dayEl.onclick = () => openBooking(show.id);
+                } else {
+                    dayEl.innerHTML = `<span style="font-size:12px; color:#444;">${i}</span>`;
                 }
-                left.appendChild(rowL); right.appendChild(rowR);
+                cal.appendChild(dayEl);
             }
-
-            // Achterste Ringen (Rood - Price Level 3)
-            for(let r=0; r<4; r++) {
-                const row = document.createElement('div'); row.className = 'row';
-                for(let s=0; s<40; s++) row.innerHTML += `<div class="seat s3" onclick="bookSeat(${r*200+s})"></div>`;
-                back.appendChild(row);
-            }
+        } catch (e) {
+            cal.innerHTML = "Fout bij laden schema.";
         }
-
-        async function handleAuth() {
-            const e = document.getElementById('auth-email').value;
-            const p = document.getElementById('auth-pass').value;
-            try {
-                await auth.signInWithEmailAndPassword(e, p);
-                location.reload();
-            } catch {
-                await auth.createUserWithEmailAndPassword(e, p);
-                location.reload();
-            }
-        }
-
-        function openModal(id) { document.getElementById('overlay').style.display='block'; document.getElementById(id).style.display='block'; }
-        function closeAll() { document.querySelectorAll('.modal, .overlay').forEach(el => el.style.display='none'); }
-    </script>
-</body>
-</html>
+    }
+</script>
