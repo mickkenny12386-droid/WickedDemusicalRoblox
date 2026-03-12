@@ -68,7 +68,7 @@
         <div class="logo">WICKED <span style="color: var(--emerald);">ROBLOX</span></div>
         <div class="nav-links">
             <a onclick="location.reload()">HOME</a>
-            <a id="admin-btn" style="display:none; color: gold;" onclick="openModal('admin-modal')">WITCH MASTER</a>
+            <a id="admin-btn" style="display:none; color: gold; border: 1px solid gold; padding: 5px 10px; border-radius: 5px;" onclick="openModal('admin-modal')">WITCH MASTER (ADMIN)</a>
             <a id="login-nav" onclick="openModal('auth-modal')">LOG IN</a>
         </div>
     </nav>
@@ -82,7 +82,7 @@
         <aside>
             <div class="glass-card">
                 <h3 id="user-title">Welkom</h3>
-                <div id="user-tickets" style="font-size: 13px; color: #aaa;">Log in om je tickets te bekijken.</div>
+                <div id="user-tickets" style="font-size: 13px; color: #aaa;">Log in voor tickets.</div>
             </div>
             <br>
             <div class="glass-card">
@@ -102,25 +102,22 @@
         <input type="email" id="auth-email" placeholder="E-mail">
         <input type="password" id="auth-pass" placeholder="Wachtwoord">
         <button class="btn" onclick="handleAuth()">BEVESTIGEN</button>
-        <p style="font-size: 10px; text-align: center; color: #555; margin-top: 15px;">Gebruik Virtual@gmail.com voor admin toegang.</p>
     </div>
 
     <div class="modal" id="book-modal" style="width: 650px;">
-        <h2 id="book-date" style="font-family: 'Cinzel'; margin-bottom: 5px;">Reserveer Plaatsen</h2>
-        <p id="book-cast" style="font-size: 12px; color: var(--emerald); margin-bottom: 20px;"></p>
-        <div style="width: 100%; height: 5px; background: white; margin-bottom: 30px; box-shadow: 0 0 10px white;"></div>
+        <h2 id="book-date" style="font-family: 'Cinzel';">Reserveer Plaatsen</h2>
+        <p id="book-cast" style="font-size: 12px; color: var(--emerald);"></p>
         <div class="seating-grid" id="seating-grid"></div>
         <br>
         <button class="btn" style="background: #333; color: white;" onclick="closeAll()">SLUITEN</button>
     </div>
 
     <div class="modal" id="admin-modal">
-        <h2 style="font-family: 'Cinzel'; color: gold;">Witch Master Dashboard</h2>
-        <label>Algemene Cast Informatie:</label>
-        <textarea id="adm-cast-global" rows="4"></textarea>
+        <h2 style="font-family: 'Cinzel'; color: gold;">Admin Dashboard</h2>
+        <label>Cast Info:</label>
+        <textarea id="adm-cast-global" rows="3"></textarea>
         <button class="btn" onclick="updateGlobal()">UPDATE CAST</button>
-        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        <h3>Nieuwe Show Plannen</h3>
+        <hr style="border-top: 1px solid #333; margin: 15px 0;">
         <input type="number" id="adm-day" placeholder="Dag (1-31)">
         <input type="text" id="adm-time" placeholder="Tijd (bijv. 19:30)">
         <button class="btn" style="background: white;" onclick="addShow()">VOEG SHOW TOE</button>
@@ -139,7 +136,8 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // AUTH LOGIC
+        const ADMIN_EMAIL = "Virtual@gmail.com";
+
         async function handleAuth() {
             const e = document.getElementById('auth-email').value;
             const p = document.getElementById('auth-pass').value;
@@ -156,17 +154,21 @@
 
         auth.onAuthStateChanged(async user => {
             if(user) {
-                document.getElementById('login-nav').innerText = "UITLOGGEN (" + user.email.split('@')[0] + ")";
+                document.getElementById('login-nav').innerText = "UITLOGGEN";
                 document.getElementById('login-nav').onclick = () => auth.signOut().then(()=>location.reload());
                 document.getElementById('user-title').innerText = "Hallo, " + user.email.split('@')[0];
-                if(user.email === "Virtual@gmail.com") document.getElementById('admin-btn').style.display = 'inline';
+                
+                // EXTRA CHECK VOOR ADMIN
+                if(user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                    console.log("Admin ingelogd!");
+                    document.getElementById('admin-btn').style.display = 'inline-block';
+                }
                 loadUserTickets(user.uid);
             }
             renderCalendar();
             loadGlobal();
         });
 
-        // DATA LOADING
         async function loadGlobal() {
             const doc = await db.collection('settings').doc('global').get();
             if(doc.exists) document.getElementById('cast-display').innerText = doc.data().cast;
@@ -176,16 +178,14 @@
             const snap = await db.collection('shows').get();
             const shows = {};
             snap.forEach(doc => shows[doc.data().day] = {id: doc.id, ...doc.data()});
-            
             const cal = document.getElementById('calendar');
             cal.innerHTML = '';
             for(let i=1; i<=31; i++) {
                 const s = shows[i];
-                cal.innerHTML += `
-                    <div class="day ${s ? 'active' : ''}" onclick="${s ? `openBooking('${s.id}', ${i})` : ''}">
-                        <span class="day-num">${i}</span>
-                        ${s ? `<span class="show-tag">${s.time}</span>` : ''}
-                    </div>`;
+                cal.innerHTML += `<div class="day ${s ? 'active' : ''}" onclick="${s ? `openBooking('${s.id}', ${i})` : ''}">
+                    <span class="day-num">${i}</span>
+                    ${s ? `<span class="show-tag">${s.time}</span>` : ''}
+                </div>`;
             }
         }
 
@@ -194,19 +194,13 @@
             activeShow = id;
             const doc = await db.collection('shows').doc(id).get();
             const data = doc.data();
-            
-            document.getElementById('book-date').innerText = day + " MAART 2026";
-            document.getElementById('book-cast').innerText = "Cast: " + (data.cast || "Standaard Cast");
-            
+            document.getElementById('book-date').innerText = day + " MAART";
+            document.getElementById('book-cast').innerText = "Cast: " + (data.cast || "Standaard");
             const grid = document.getElementById('seating-grid');
             grid.innerHTML = '';
             const taken = data.takenSeats || [];
-
             for(let i=1; i<=48; i++) {
-                let status = 'free';
-                if(taken.includes(i)) status = 'taken';
-                else if(i <= 12) status = 'vip';
-                
+                let status = taken.includes(i) ? 'taken' : (i <= 12 ? 'vip' : 'free');
                 grid.innerHTML += `<div class="seat ${status}" onclick="bookSeat(${i}, '${status}')">${i}</div>`;
             }
             openModal('book-modal');
@@ -215,47 +209,32 @@
         async function bookSeat(num, status) {
             if(status === 'taken') return;
             if(!auth.currentUser) return openModal('auth-modal');
-
-            await db.collection('shows').doc(activeShow).update({
-                takenSeats: firebase.firestore.FieldValue.arrayUnion(num)
-            });
-            await db.collection('users').doc(auth.currentUser.uid).collection('tickets').add({
-                seat: num,
-                date: document.getElementById('book-date').innerText
-            });
-            alert("Spreuk geslaagd! Je hebt stoel " + num + " gereserveerd.");
-            location.reload();
+            await db.collection('shows').doc(activeShow).update({ takenSeats: firebase.firestore.FieldValue.arrayUnion(num) });
+            await db.collection('users').doc(auth.currentUser.uid).collection('tickets').add({ seat: num, date: document.getElementById('book-date').innerText });
+            alert("Gereserveerd!"); location.reload();
         }
 
-        // ADMIN ACTIONS
         async function updateGlobal() {
             await db.collection('settings').doc('global').set({ cast: document.getElementById('adm-cast-global').value });
-            alert("Cast bijgewerkt!"); location.reload();
+            alert("Bijgewerkt!"); location.reload();
         }
 
         async function addShow() {
-            await db.collection('shows').add({
-                day: parseInt(document.getElementById('adm-day').value),
-                time: document.getElementById('adm-time').value,
-                takenSeats: []
-            });
-            alert("Show toegevoegd aan de tijdlijn!"); location.reload();
+            await db.collection('shows').add({ day: parseInt(document.getElementById('adm-day').value), time: document.getElementById('adm-time').value, takenSeats: [] });
+            alert("Show toegevoegd!"); location.reload();
         }
 
-        // UI HELPERS
         function openModal(id) {
             document.getElementById('overlay').style.display = 'block';
             document.getElementById(id).style.display = 'block';
         }
-        function closeAll() {
-            document.querySelectorAll('.modal, .overlay').forEach(el => el.style.display = 'none');
-        }
+        function closeAll() { document.querySelectorAll('.modal, .overlay').forEach(el => el.style.display = 'none'); }
         async function loadUserTickets(uid) {
             const snap = await db.collection('users').doc(uid).collection('tickets').get();
             const div = document.getElementById('user-tickets');
             if(!snap.empty) {
-                div.innerHTML = '<b>Jouw Tickets:</b><br>';
-                snap.forEach(doc => div.innerHTML += `<div style="color:var(--emerald); margin-top:5px;">• Stoel ${doc.data().seat} (${doc.data().date})</div>`);
+                div.innerHTML = '<b>Tickets:</b>';
+                snap.forEach(doc => div.innerHTML += `<div style="color:var(--emerald); margin-top:3px;">• Stoel ${doc.data().seat}</div>`);
             }
         }
     </script>
