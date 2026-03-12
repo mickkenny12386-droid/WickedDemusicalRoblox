@@ -4,170 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wicked | Official Roblox Production</title>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --wicked-green: #97d72e;
-            --emerald-glow: rgba(151, 215, 46, 0.3);
-            --dark-panel: rgba(20, 20, 20, 0.95);
-        }
-
-        body {
-            margin: 0;
-            background: #000;
-            color: #fff;
-            font-family: 'Montserrat', sans-serif;
-            line-height: 1.6;
-        }
-
-        /* Navigatie */
-        nav {
-            position: fixed;
-            top: 0; width: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            justify-content: space-between;
-            padding: 20px 50px;
-            box-sizing: border-box;
-            z-index: 100;
-            border-bottom: 1px solid #222;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            margin-left: 25px;
-            font-size: 12px;
-            letter-spacing: 2px;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover { color: var(--wicked-green); }
-
-        /* Hero Sectie */
-        .hero {
-            height: 60vh;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            position: relative;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, transparent, #000);
-        }
-
-        .hero h1 {
-            font-size: 4rem;
-            letter-spacing: 12px;
-            z-index: 2;
-            text-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        /* Main Content */
-        .grid {
-            max-width: 1200px;
-            margin: -40px auto 50px;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
-            padding: 0 20px;
-            position: relative;
-            z-index: 5;
-        }
-
-        .card {
-            background: var(--dark-panel);
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        /* Kalender */
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            border: 1px solid #222;
-        }
-
-        .day {
-            min-height: 100px;
-            border: 1px solid #222;
-            padding: 10px;
-            transition: 0.3s;
-        }
-
-        .day:hover { background: rgba(151, 215, 46, 0.05); }
-
+        :root { --wicked-green: #97d72e; --dark-panel: rgba(20, 20, 20, 0.95); }
+        body { margin: 0; background: #000; color: #fff; font-family: 'Montserrat', sans-serif; }
+        nav { position: fixed; top: 0; width: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: space-between; padding: 20px 50px; box-sizing: border-box; z-index: 100; border-bottom: 1px solid #222; }
+        .nav-links a { color: #fff; text-decoration: none; margin-left: 25px; font-size: 12px; letter-spacing: 2px; cursor: pointer; }
+        .hero { height: 50vh; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; position: relative; }
+        .hero::after { content: ''; position: absolute; bottom: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, #000); }
+        .grid { max-width: 1200px; margin: -40px auto 50px; display: grid; grid-template-columns: 320px 1fr; gap: 30px; padding: 0 20px; position: relative; z-index: 5; }
+        .card { background: var(--dark-panel); border: 1px solid #333; border-radius: 12px; padding: 25px; }
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid #222; }
+        .day { min-height: 110px; border: 1px solid #222; padding: 10px; transition: 0.3s; }
         .date-label { font-size: 11px; color: #666; display: block; text-align: right; }
-
-        .btn-ticket {
-            background: var(--wicked-green);
-            color: #000;
-            border: none;
-            width: 100%;
-            padding: 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 10px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        /* Auth Form */
-        #auth-box {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: #111;
-            padding: 40px;
-            border-radius: 15px;
-            border: 2px solid var(--wicked-green);
-            display: none;
-            z-index: 1000;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            box-sizing: border-box;
-        }
-
-        .ticket-item {
-            background: rgba(151, 215, 46, 0.1);
-            border-left: 3px solid var(--wicked-green);
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
-
-        /* Admin Paneel Overlay */
-        #admin-panel {
-            display: none;
-            position: fixed;
-            background: rgba(0,0,0,0.95);
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2000;
-            padding: 50px;
-            box-sizing: border-box;
-        }
+        .show-tag { background: rgba(151, 215, 46, 0.2); color: var(--wicked-green); font-size: 10px; padding: 4px; border-radius: 3px; margin-top: 5px; text-align: center; font-weight: bold; }
+        .btn-ticket { background: var(--wicked-green); color: #000; border: none; width: 100%; padding: 6px; border-radius: 4px; font-weight: bold; font-size: 10px; cursor: pointer; margin-top: 5px; }
+        #auth-box, #admin-panel { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 40px; border-radius: 15px; border: 2px solid var(--wicked-green); display: none; z-index: 1000; width: 400px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; box-sizing: border-box; }
+        .admin-list-item { font-size: 12px; background: #222; padding: 5px; margin-bottom: 5px; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -175,34 +32,28 @@
     <nav>
         <div style="font-weight: bold; letter-spacing: 2px;">WICKED <span style="color: var(--wicked-green);">ROBLOX</span></div>
         <div class="nav-links">
-            <a href="#" onclick="location.reload()">HOME</a>
-            <a href="#" id="auth-btn" onclick="toggleAuthBox()">INLOGGEN</a>
-            <a href="#" id="admin-btn" style="display:none; color: gold;" onclick="toggleAdminPanel()">ADMIN PANEEL</a>
+            <a onclick="location.reload()">HOME</a>
+            <a id="auth-btn" onclick="document.getElementById('auth-box').style.display='block'">INLOGGEN</a>
+            <a id="admin-btn" style="display:none; color: gold;" onclick="document.getElementById('admin-panel').style.display='block'">ADMIN</a>
         </div>
     </nav>
 
-    <section class="hero" id="hero-img" style="background-image: url('https://www.wickedthemusical.co.uk/wp-content/uploads/2023/10/Wicked_Header_Green_Texture.jpg');">
-        <h1>THE EMERALD CITY</h1>
+    <section class="hero" id="hero-img">
+        <h1 style="font-size: 4rem; letter-spacing: 10px; z-index: 2;">WICKED</h1>
     </section>
 
     <div class="grid">
         <aside>
             <div class="card">
-                <h3 id="user-welcome">Welkom, gast!</h3>
-                <p style="font-size: 11px; color: #888;">JOUW TICKETS:</p>
-                <div id="ticket-list">Log in om je tickets te zien.</div>
+                <h3 id="user-welcome">Welkom!</h3>
+                <div id="ticket-list">Log in voor je tickets.</div>
             </div>
             <br>
-            <div class="card">
-                <h3 style="color: var(--wicked-green)">HUIDIGE CAST</h3>
-                <p id="cast-display" style="font-size: 13px;">Laden...</p>
-            </div>
+            <div class="card"><h3 style="color: var(--wicked-green)">CAST</h3><p id="cast-display">Laden...</p></div>
         </aside>
-
         <main class="card">
             <h3>SPEELSCHEMA MAART 2026</h3>
-            <div class="calendar" id="calendar-grid">
-                </div>
+            <div class="calendar" id="calendar-grid"></div>
         </main>
     </div>
 
@@ -211,23 +62,24 @@
         <input type="email" id="email" placeholder="E-mail">
         <input type="password" id="password" placeholder="Wachtwoord">
         <button class="btn-ticket" onclick="handleAuth()" style="font-size: 14px;">BEVESTIGEN</button>
-        <p onclick="switchAuth()" style="cursor:pointer; font-size: 12px; text-align: center; margin-top: 15px;">Account aanmaken?</p>
+        <p onclick="isLogin=!isLogin; document.getElementById('auth-title').innerText=isLogin?'Inloggen':'Registreren'" style="cursor:pointer; font-size:12px; text-align:center;">Switch inlog/registreer</p>
     </div>
 
-    <div id="admin-panel">
-        <button onclick="toggleAdminPanel()" style="background: red; color: white; border: none; padding: 10px; cursor: pointer;">SLUITEN</button>
+    <div id="admin-panel" style="overflow-y: auto; max-height: 80vh;">
+        <span onclick="this.parentElement.style.display='none'" style="float:right; cursor:pointer; color:red;">X</span>
         <h2>Admin Dashboard</h2>
-        <div style="max-width: 500px;">
-            <label>Achtergrond URL:</label>
-            <input type="text" id="admin-bg" placeholder="URL naar foto">
-            <label>Cast Lijst:</label>
-            <textarea id="admin-cast" style="width:100%; height:100px; background:#222; color:white; border:1px solid #444; padding:10px;"></textarea>
-            <button class="btn-ticket" onclick="saveAdminSettings()" style="font-size: 16px; margin-top: 20px;">UPDATE SITE VOOR IEDEREEN</button>
-        </div>
+        <label>Achtergrond URL:</label> <input type="text" id="admin-bg">
+        <label>Cast Lijst:</label> <textarea id="admin-cast"></textarea>
+        <button class="btn-ticket" onclick="saveGlobal()">UPDATE BASIS</button>
+        <hr>
+        <h3>Show Toevoegen</h3>
+        <input type="number" id="new-day" placeholder="Dag (bijv 15)">
+        <input type="text" id="new-time" placeholder="Tijd (bijv 19:30)">
+        <button class="btn-ticket" onclick="addShow()">VOEG SHOW TOE</button>
+        <div id="admin-shows-list"></div>
     </div>
 
     <script>
-        // --- JOUW FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyC6NE5hOdVdRc1JJuxe5jbyT7LLaXJi84o",
             authDomain: "wickeddemusical.firebaseapp.com",
@@ -236,107 +88,82 @@
             messagingSenderId: "81908034436",
             appId: "1:81908034436:web:1d56709ad83e7492e4cbd1"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-
         let isLogin = true;
 
-        // --- AUTH LOGICA ---
-        function toggleAuthBox() { document.getElementById('auth-box').style.display = 'block'; }
-        function switchAuth() { 
-            isLogin = !isLogin; 
-            document.getElementById('auth-title').innerText = isLogin ? "Inloggen" : "Registreren";
-        }
-
         async function handleAuth() {
-            const e = document.getElementById('email').value;
-            const p = document.getElementById('password').value;
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
             try {
-                if(isLogin) {
-                    await auth.signInWithEmailAndPassword(e, p);
-                } else {
-                    const res = await auth.createUserWithEmailAndPassword(e, p);
-                    await db.collection('users').doc(res.user.uid).set({ email: e, tickets: [], role: 'user' });
+                if(isLogin) await auth.signInWithEmailAndPassword(e, p);
+                else {
+                    const r = await auth.createUserWithEmailAndPassword(e, p);
+                    await db.collection('users').doc(r.user.uid).set({ email: e, tickets: [], role: 'user' });
                 }
                 location.reload();
             } catch(err) { alert(err.message); }
         }
 
-        // --- TICKETS KOPEN ---
-        async function claimTicket(date) {
-            const user = auth.currentUser;
-            if(!user) return toggleAuthBox();
-            
-            await db.collection('users').doc(user.uid).update({
-                tickets: firebase.firestore.FieldValue.arrayUnion({ date: date, show: "Wicked Roblox" })
-            });
-            alert("Ticket toegevoegd aan je account!");
-            location.reload();
-        }
-
-        // --- DATA LADEN ---
         auth.onAuthStateChanged(async user => {
             if(user) {
                 document.getElementById('auth-btn').innerText = "UITLOGGEN";
-                document.getElementById('auth-btn').onclick = () => auth.signOut().then(() => location.reload());
+                document.getElementById('auth-btn').onclick = () => auth.signOut().then(()=>location.reload());
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data();
+                document.getElementById('user-welcome').innerText = "Hallo, " + data.email.split('@')[0];
+                if(data.role === 'admin' || data.email === "jouw-email@gmail.com") document.getElementById('admin-btn').style.display='inline';
                 
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                const userData = userDoc.data();
-                
-                document.getElementById('user-welcome').innerText = `Hallo, ${userData.email.split('@')[0]}!`;
-                
-                // Admin check
-                if(p === "Virtual2025!" || userData.role === 'admin') { 
-                    document.getElementById('admin-btn').style.display = 'inline';
-                }
-
-                // Tickets tonen
-                const tList = document.getElementById('ticket-list');
-                tList.innerHTML = userData.tickets.length ? '' : 'Geen tickets.';
-                userData.tickets.forEach(t => {
-                    tList.innerHTML += `<div class="ticket-item">🎟️ ${t.show} - ${t.date}</div>`;
-                });
+                const tList = document.getElementById('ticket-list'); tList.innerHTML = "";
+                data.tickets.forEach(t => tList.innerHTML += `<div class="show-tag">🎟️ ${t.date} - ${t.time}</div>`);
             }
-            loadGlobalSettings();
-            renderCalendar();
+            loadData();
         });
 
-        async function loadGlobalSettings() {
-            const snap = await db.collection('settings').doc('global').get();
-            if(snap.exists) {
-                const data = snap.data();
-                document.getElementById('cast-display').innerText = data.cast;
-                document.getElementById('hero-img').style.backgroundImage = `url('${data.bg}')`;
+        async function loadData() {
+            const settings = await db.collection('settings').doc('global').get();
+            if(settings.exists) {
+                document.getElementById('cast-display').innerText = settings.data().cast;
+                document.getElementById('hero-img').style.backgroundImage = `url('${settings.data().bg}')`;
             }
+            const showsSnap = await db.collection('shows').orderBy('day').get();
+            const shows = [];
+            const adminList = document.getElementById('admin-shows-list'); adminList.innerHTML = "<h4>Huidige Shows:</h4>";
+            showsSnap.forEach(doc => {
+                shows.push({id: doc.id, ...doc.data()});
+                adminList.innerHTML += `<div class="admin-list-item">Dag ${doc.data().day} - ${doc.data().time} <button onclick="deleteShow('${doc.id}')" style="color:red">X</button></div>`;
+            });
+            renderCalendar(shows);
         }
 
-        // --- ADMIN FUNCTIES ---
-        function toggleAdminPanel() {
-            const panel = document.getElementById('admin-panel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-
-        async function saveAdminSettings() {
-            const bg = document.getElementById('admin-bg').value;
-            const cast = document.getElementById('admin-cast').value;
-            await db.collection('settings').doc('global').set({ bg, cast });
-            alert("Systeem bijgewerkt voor alle gebruikers!");
-            location.reload();
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
+        function renderCalendar(shows) {
+            const grid = document.getElementById('calendar-grid'); grid.innerHTML = "";
             for(let i=1; i<=31; i++) {
-                grid.innerHTML += `
-                    <div class="day">
-                        <span class="date-label">${i} MRT</span>
-                        <button class="btn-ticket" onclick="claimTicket('${i} Maart')">GRATIS TICKET</button>
-                    </div>
-                `;
+                const dayShows = shows.filter(s => s.day == i);
+                let html = `<div class="day"><span class="date-label">${i} MRT</span>`;
+                dayShows.forEach(s => html += `<div class="show-tag">${s.time}</div><button class="btn-ticket" onclick="buy('${i} Maart', '${s.time}')">TICKET</button>`);
+                grid.innerHTML += html + `</div>`;
             }
+        }
+
+        async function buy(d, t) {
+            const u = auth.currentUser; if(!u) return alert("Log eerst in!");
+            await db.collection('users').doc(u.uid).update({ tickets: firebase.firestore.FieldValue.arrayUnion({date:d, time:t}) });
+            alert("Ticket gekocht!"); location.reload();
+        }
+
+        async function saveGlobal() {
+            await db.collection('settings').doc('global').set({ bg: document.getElementById('admin-bg').value, cast: document.getElementById('admin-cast').value });
+            alert("Basis bijgewerkt!"); location.reload();
+        }
+
+        async function addShow() {
+            await db.collection('shows').add({ day: parseInt(document.getElementById('new-day').value), time: document.getElementById('new-time').value });
+            alert("Show toegevoegd!"); location.reload();
+        }
+
+        async function deleteShow(id) {
+            if(confirm("Show verwijderen?")) { await db.collection('shows').doc(id).delete(); location.reload(); }
         }
     </script>
 </body>
