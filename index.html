@@ -20,14 +20,12 @@
         .section-box { background: var(--glass); border: 1px solid var(--border); padding: 35px; border-radius: 12px; display: none; backdrop-filter: blur(10px); }
         .section-box.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* Wizard Tabs */
         .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .tab-btn { background: none; border: 1px solid var(--emerald); color: var(--emerald); padding: 8px 15px; cursor: pointer; border-radius: 4px; }
         .tab-btn.active { background: var(--emerald); color: black; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Booking UI */
         .booking-container { background: #fff; color: #000; border-radius: 8px; overflow: hidden; margin-top: 20px; }
         .step-header { padding: 15px; background: #f8f8f8; border-bottom: 1px solid #ddd; font-weight: 600; display: flex; justify-content: space-between; }
         .tier-option { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
@@ -67,7 +65,7 @@
         
         <section id="my-tickets" class="section-box">
             <h2>Your Tickets</h2>
-            <p style="font-size: 12px; color: var(--gold);">Tickets are saved to this browser's network.</p>
+            <p style="font-size: 12px; color: var(--gold);">Tickets are saved to your current browser network.</p>
             <div id="local-tickets-display" class="grid-3"></div>
         </section>
 
@@ -86,10 +84,18 @@
                         <input type="text" id="book-name" class="light-input" placeholder="Your Full Name">
                         <input type="number" id="book-qty" class="light-input" value="1" min="1" max="10">
                     </div>
-                    <div class="step-header">2. Seating: <span id="sel-tier" style="color:var(--emerald)">-</span></div>
-                    <div class="tier-option" id="t1" onclick="selectTier('Rang 1 (Midden)')"><b>Rang 1 (Midden)</b> 30 R$</div>
-                    <div class="tier-option" id="t2" onclick="selectTier('Rang 2 (Links)')"><b>Rang 2 (Links)</b> Gratis</div>
-                    <div class="tier-option" id="t3" onclick="selectTier('Rang 3 (Rechts)')"><b>Rang 3 (Rechts)</b> Gratis</div>
+                    <div class="step-header">2. Seating: <span id="sel-tier" style="color:var(--emerald)">None selected</span></div>
+                    
+                    <div class="tier-option" id="t1" onclick="selectTier('Tier 1 (Center)')">
+                        <b>Tier 1 (Center)</b> <span>30 R$</span>
+                    </div>
+                    <div class="tier-option" id="t2" onclick="selectTier('Tier 2 (Left Side)')">
+                        <b>Tier 2 (Left Side)</b> <span>Free</span>
+                    </div>
+                    <div class="tier-option" id="t3" onclick="selectTier('Tier 3 (Right Side)')">
+                        <b>Tier 3 (Right Side)</b> <span>Free</span>
+                    </div>
+                    
                     <button class="btn" style="background:var(--red); color:white; border-radius:0;" onclick="buyTicket()">Confirm Reservation</button>
                 </div>
             </div>
@@ -119,7 +125,7 @@
             </div>
 
             <div id="tab-tickets" class="tab-content active">
-                <h3>Ticket Database</h3>
+                <h3>Ticket Database (Max 1850)</h3>
                 <input type="number" id="adm-day" placeholder="Add Show Day (e.g. 20)">
                 <input type="text" id="adm-time" placeholder="Time (e.g. 20:00)">
                 <button class="btn" onclick="addShow()">Add Show</button>
@@ -144,7 +150,7 @@
                 <h3>Cast Manager</h3>
                 <input type="text" id="adm-cast-role" placeholder="Role">
                 <input type="text" id="adm-cast-name" placeholder="Name">
-                <button class="btn" onclick="addCast()">Add Cast</button>
+                <button class="btn" onclick="addCast()">Add Cast Member</button>
                 <div id="list-cast" style="margin-top:20px;"></div>
             </div>
             
@@ -168,6 +174,7 @@
         const db = firebase.firestore();
 
         let currentShow = ""; let currentTier = "";
+        const MAX_SEATS = 1850;
 
         function showSection(id) {
             document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
@@ -182,45 +189,51 @@
             loadAdminData();
         }
 
+        // Updated Seating Logic
         function selectTier(name) {
             currentTier = name;
             document.getElementById('sel-tier').innerText = name;
             document.querySelectorAll('.tier-option').forEach(o => o.classList.remove('selected'));
+            
+            // Link selection to specific IDs for visual feedback
             if(name.includes('1')) document.getElementById('t1').classList.add('selected');
             if(name.includes('2')) document.getElementById('t2').classList.add('selected');
             if(name.includes('3')) document.getElementById('t3').classList.add('selected');
         }
 
-        // --- TICKETS (NETWORK SAVING) ---
         async function buyTicket() {
             const name = document.getElementById('book-name').value;
             const qty = document.getElementById('book-qty').value;
-            if(!name || !currentTier) return alert("Complete the form!");
+            if(!name || !currentTier) return alert("Please complete the form and select a tier!");
 
-            const ticketData = { name, show: currentShow, tier: currentTier, qty, ts: Date.now() };
-            const docRef = await db.collection('bookings').add(ticketData);
+            const ticketData = { name, show: currentShow, tier: currentTier, qty: parseInt(qty), ts: Date.now() };
+            await db.collection('bookings').add(ticketData);
             
-            // Opslaan in lokaal netwerk (localStorage)
             let myTickets = JSON.parse(localStorage.getItem('wicked_tickets') || "[]");
             myTickets.push(ticketData);
             localStorage.setItem('wicked_tickets', JSON.stringify(myTickets));
 
-            alert("Reserved! Ticket saved to your device.");
+            alert("Success! Your reservation is saved.");
             location.reload();
+        }
+
+        async function updateSeatCount(showName) {
+            const snap = await db.collection('bookings').where('show', '==', showName).get();
+            let taken = 0; snap.forEach(doc => taken += doc.data().qty);
+            document.getElementById('seat-count').innerText = (MAX_SEATS - taken) + " seats available";
         }
 
         function loadLocalTickets() {
             const display = document.getElementById('local-tickets-display');
             const tickets = JSON.parse(localStorage.getItem('wicked_tickets') || "[]");
-            display.innerHTML = tickets.length ? "" : "No tickets found on this network.";
+            display.innerHTML = tickets.length ? "" : "No tickets found on this device.";
             tickets.forEach(t => {
                 display.innerHTML += `<div class="card" style="border-left: 4px solid var(--emerald)">
-                    <b>${t.show}</b><br>${t.tier}<br>Qty: ${t.qty}
+                    <b>${t.show}</b><br>${t.tier}<br>Quantity: ${t.qty}
                 </div>`;
             });
         }
 
-        // --- AUDITIONS ---
         async function submitAudition() {
             const data = {
                 name: document.getElementById('aud-name').value,
@@ -230,21 +243,23 @@
                 role: document.getElementById('aud-role').value,
                 ts: Date.now()
             };
+            if(!data.name) return alert("Please fill in your name.");
             await db.collection('auditions').add(data);
-            alert("Application Sent!");
+            alert("Application Sent! We will contact you soon.");
             showSection('theshow');
         }
 
-        // --- ADMIN DATA LOADER ---
         async function loadAdminData() {
+            // Bookings
             const ticketList = document.getElementById('list-tickets');
             ticketList.innerHTML = "<h4>Live Bookings</h4>";
             const bks = await db.collection('bookings').orderBy('ts', 'desc').get();
             bks.forEach(doc => {
                 ticketList.innerHTML += `<div class="admin-item"><button class="del-btn" onclick="deleteDoc('bookings','${doc.id}')">X</button>
-                ${doc.data().name} - ${doc.data().show} (${doc.data().qty}x)</div>`;
+                ${doc.data().name} - ${doc.data().show} [${doc.data().tier}] (${doc.data().qty}x)</div>`;
             });
 
+            // Auditions
             const audList = document.getElementById('list-auditions');
             audList.innerHTML = "<h4>Applications</h4>";
             const auds = await db.collection('auditions').get();
@@ -254,22 +269,24 @@
                 <b>${d.name} (${d.age})</b><br>Role: ${d.role}<br>Exp: ${d.exp}<br>Avail: ${d.avail}</div>`;
             });
 
+            // News
             const newsList = document.getElementById('list-news');
-            newsList.innerHTML = "<h4>News List</h4>";
+            newsList.innerHTML = "<h4>News Archive</h4>";
             const news = await db.collection('newsletter').get();
             news.forEach(doc => {
                 newsList.innerHTML += `<div class="admin-item"><button class="del-btn" onclick="deleteDoc('newsletter','${doc.id}')">X</button>${doc.data().title}</div>`;
             });
 
+            // Cast
             const castList = document.getElementById('list-cast');
-            castList.innerHTML = "<h4>Cast List</h4>";
+            castList.innerHTML = "<h4>Oz Cast</h4>";
             const cast = await db.collection('cast').get();
             cast.forEach(doc => {
                 castList.innerHTML += `<div class="admin-item"><button class="del-btn" onclick="deleteDoc('cast','${doc.id}')">X</button>${doc.data().role}: ${doc.data().name}</div>`;
             });
         }
 
-        async function deleteDoc(col, id) { if(confirm("Delete?")) { await db.collection(col).doc(id).delete(); loadAdminData(); } }
+        async function deleteDoc(col, id) { if(confirm("Confirm deletion?")) { await db.collection(col).doc(id).delete(); loadAdminData(); } }
         async function postNews() {
             await db.collection('newsletter').add({ 
                 title: document.getElementById('adm-news-title').value,
@@ -296,7 +313,6 @@
             loadAdminData();
         }
 
-        // --- INITIALIZATION ---
         function init() {
             db.collection('shows').onSnapshot(snap => {
                 const cal = document.getElementById('calendar');
@@ -309,8 +325,9 @@
                     d.innerHTML = i + (s ? `<br><small>${s}</small>` : '');
                     if(s) d.onclick = () => {
                         currentShow = i + " March " + s;
-                        document.getElementById('sel-show-title').innerText = "Show: " + currentShow;
+                        document.getElementById('sel-show-title').innerText = "Booking: " + currentShow;
                         document.getElementById('booking-ui').style.display = 'block';
+                        updateSeatCount(currentShow);
                     };
                     cal.appendChild(d);
                 }
