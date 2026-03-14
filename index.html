@@ -15,8 +15,7 @@
         
         nav { background: rgba(0,0,0,0.98); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--emerald); position: sticky; top: 0; z-index: 1000; }
         .logo { font-family: 'Cinzel'; font-size: 22px; letter-spacing: 3px; }
-        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 11px; text-transform: uppercase; cursor: pointer; margin-left: 15px; transition: 0.3s; }
-        .nav-links a:hover { color: white; text-shadow: 0 0 10px var(--emerald); }
+        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 11px; text-transform: uppercase; cursor: pointer; margin-left: 15px; }
 
         .container { max-width: 1100px; margin: 30px auto; padding: 20px; }
         .section-box { background: var(--glass); border: 1px solid var(--border); padding: 35px; border-radius: 12px; display: none; backdrop-filter: blur(10px); }
@@ -24,25 +23,23 @@
 
         /* Kalender */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 20px; }
-        .day { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 10px; text-align: center; border-radius: 5px; font-size: 13px; }
-        .day.has-show { border-color: var(--emerald); background: rgba(151, 215, 46, 0.15); cursor: pointer; font-weight: bold; }
+        .day { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 10px; text-align: center; border-radius: 5px; }
+        .day.has-show { border-color: var(--emerald); background: rgba(151, 215, 46, 0.15); cursor: pointer; }
         .day.has-show:hover { background: var(--emerald); color: black; }
 
-        /* Nieuws & Cast */
+        /* Grid & Cards */
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .card { background: rgba(255,255,255,0.03); border: 1px solid #222; border-radius: 8px; overflow: hidden; }
+        .card { background: rgba(255,255,255,0.03); border: 1px solid #222; border-radius: 8px; overflow: hidden; position: relative; }
         .card img { width: 100%; height: 180px; object-fit: cover; border-bottom: 2px solid var(--emerald); }
         .card-body { padding: 15px; }
 
-        /* Admin */
-        .admin-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .admin-list-item { background: #111; padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-size: 12px; }
-        
         input, textarea { width: 100%; padding: 10px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; }
-        .btn { background: var(--emerald); color: black; padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; width: 100%; transition: 0.2s; }
-        .btn:hover { background: white; transform: translateY(-2px); }
+        .btn { background: var(--emerald); color: black; padding: 12px; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; width: 100%; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .admin-item { background: #111; padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { background: #ff4444; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 10px; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -53,7 +50,7 @@
             <a onclick="showSection('theshow')">Schedule</a>
             <a onclick="showSection('newsletter')">News</a>
             <a onclick="showSection('cast-page')">Cast</a>
-            <a onclick="showSection('audities')">Auditions</a>
+            <a onclick="showSection('yourvisit')">My Tickets</a>
             <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin-box')">Admin Panel</a>
             <a id="auth-nav" onclick="showSection('login-box')">Login</a>
         </div>
@@ -63,8 +60,17 @@
         
         <section id="theshow" class="section-box active">
             <h2>Performance Schedule</h2>
-            <p>Selecteer een datum voor meer informatie over de show.</p>
             <div id="calendar" class="calendar-grid"></div>
+            <div id="booking-ui" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                <h3 id="selected-date-label" style="color:var(--emerald);"></h3>
+                <input type="number" id="book-qty" value="1" min="1" max="10" style="width:100px;">
+                <button class="btn" onclick="reserveTicket()">Reserveer Tickets</button>
+            </div>
+        </section>
+
+        <section id="yourvisit" class="section-box">
+            <h2>Your Enchanted Tickets</h2>
+            <div id="my-tickets-container">Log in om je tickets te zien.</div>
         </section>
 
         <section id="newsletter" class="section-box">
@@ -73,46 +79,30 @@
         </section>
 
         <section id="cast-page" class="section-box">
-            <h2>The Cast of Oz</h2>
+            <h2>The Cast</h2>
             <div id="cast-container" class="grid-3"></div>
-        </section>
-
-        <section id="audities" class="section-box">
-            <h2>Auditions</h2>
-            <div id="aud-form">
-                <input type="text" id="aud-discord" placeholder="Discord Username (Required)">
-                <input type="text" id="aud-role" placeholder="Desired Role">
-                <textarea id="aud-text" placeholder="Musical Experience..."></textarea>
-                <button class="btn" onclick="submitAudition()">Send Application</button>
-            </div>
         </section>
 
         <section id="admin-box" class="section-box" style="border: 2px solid gold;">
             <h2 style="color:gold;">Witch Master Control</h2>
-            <div class="admin-panel-grid">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                 <div>
-                    <h3>Add Show</h3>
-                    <input type="number" id="adm-day" placeholder="Day (March)">
-                    <input type="text" id="adm-time" placeholder="Time (19:30)">
-                    <button class="btn" onclick="addShow()">Save Show</button>
-                    
-                    <h3 style="margin-top:20px;">Post News</h3>
-                    <input type="text" id="adm-news-title" placeholder="Title">
-                    <input type="text" id="adm-news-img" placeholder="Image URL">
-                    <textarea id="adm-news-text" placeholder="News content..."></textarea>
-                    <button class="btn" onclick="addNews()">Publish News</button>
+                    <h3>Management</h3>
+                    <input type="number" id="adm-day" placeholder="Dag">
+                    <input type="text" id="adm-time" placeholder="Tijd">
+                    <button class="btn" onclick="addShow()">Show Toevoegen</button>
+                    <hr>
+                    <input type="text" id="adm-news-title" placeholder="News Title">
+                    <input type="text" id="adm-news-img" placeholder="Img URL">
+                    <textarea id="adm-news-text" placeholder="News text"></textarea>
+                    <button class="btn" onclick="addNews()">News Posten</button>
                 </div>
                 <div>
-                    <h3>Update Cast</h3>
-                    <input type="text" id="adm-cast-role" placeholder="Role">
-                    <input type="text" id="adm-cast-name" placeholder="Name">
-                    <button class="btn" onclick="addCast()">Add Member</button>
-
-                    <h3 style="margin-top:20px;">Management List</h3>
-                    <div id="admin-data-list" style="max-height: 200px; overflow-y: auto; background: #000; padding: 5px;"></div>
+                    <h3>Lijsten (Verwijderen)</h3>
+                    <div id="admin-list-content" style="max-height:400px; overflow-y:auto;"></div>
                 </div>
             </div>
-            <button class="btn" style="background:red; color:white; margin-top:20px;" onclick="adminLogout()">Exit Admin Mode</button>
+            <button class="btn" style="background:red; color:white; margin-top:20px;" onclick="adminLogout()">Log uit Admin</button>
         </section>
 
         <section id="login-box" class="section-box">
@@ -121,7 +111,7 @@
             <input type="password" id="pass" placeholder="Password">
             <button class="btn" onclick="authAction('login')">Login</button>
             <button class="btn" style="background:none; border:1px solid white; color:white;" onclick="authAction('signup')">Create Account</button>
-            <p onclick="adminGate()" style="text-align:center; color:gold; cursor:pointer; margin-top:20px; font-size:12px;">Admin Login</p>
+            <p onclick="adminGate()" style="text-align:center; color:gold; cursor:pointer; margin-top:20px;">Admin Access</p>
         </section>
 
     </div>
@@ -139,118 +129,123 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        let selectedDate = "";
+
         function showSection(id) {
             document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // --- DATA LADEN ---
-        function loadAll() {
-            // Kalender
+        // --- TICKETS & SCHEDULE ---
+        async function reserveTicket() {
+            const user = auth.currentUser;
+            if(!user) return alert("Je moet ingelogd zijn!");
+            await db.collection('bookings').add({
+                uid: user.uid,
+                show: selectedDate,
+                qty: document.getElementById('book-qty').value,
+                timestamp: Date.now()
+            });
+            alert("Gereserveerd!");
+            showSection('yourvisit');
+        }
+
+        function loadData() {
+            // Schedule & Calendar
             db.collection('shows').onSnapshot(snap => {
                 const cal = document.getElementById('calendar');
                 const shows = {};
-                snap.forEach(doc => shows[doc.data().day] = doc.data().time);
+                snap.forEach(doc => shows[doc.data().day] = {time: doc.data().time, id: doc.id});
                 cal.innerHTML = '';
                 for(let i=1; i<=31; i++) {
-                    cal.innerHTML += `<div class="day ${shows[i] ? 'has-show' : ''}">${i}<br><small>${shows[i] || ''}</small></div>`;
+                    const s = shows[i];
+                    const d = document.createElement('div');
+                    d.className = `day ${s ? 'has-show' : ''}`;
+                    d.innerHTML = `${i}<br><small>${s ? s.time : ''}</small>`;
+                    if(s) d.onclick = () => {
+                        selectedDate = `${i} Maart - ${s.time}`;
+                        document.getElementById('selected-date-label').innerText = "Datum: " + selectedDate;
+                        document.getElementById('booking-ui').style.display = 'block';
+                    };
+                    cal.appendChild(d);
                 }
             });
 
-            // Nieuws
+            // Newsletter
             db.collection('newsletter').onSnapshot(snap => {
                 const container = document.getElementById('news-container');
                 container.innerHTML = '';
                 snap.forEach(doc => {
                     const d = doc.data();
-                    container.innerHTML += `
-                        <div class="card">
-                            <img src="${d.img || 'https://via.placeholder.com/400x200'}">
-                            <div class="card-body"><h3>${d.title}</h3><p>${d.text}</p></div>
-                        </div>`;
+                    container.innerHTML += `<div class="card"><img src="${d.img}">
+                        <div class="card-body"><h3>${d.title}</h3><p>${d.text}</p></div></div>`;
                 });
             });
 
-            // Cast
-            db.collection('cast').onSnapshot(snap => {
-                const container = document.getElementById('cast-container');
-                container.innerHTML = '';
-                snap.forEach(doc => {
-                    container.innerHTML += `<div class="card" style="padding:20px; text-align:center;"><h3 style="color:gold">${doc.data().role}</h3><p>${doc.data().name}</p></div>`;
-                });
+            // My Tickets
+            auth.onAuthStateChanged(user => {
+                if(user) {
+                    db.collection('bookings').where('uid', '==', user.uid).onSnapshot(snap => {
+                        const container = document.getElementById('my-tickets-container');
+                        container.innerHTML = snap.empty ? "Geen tickets gevonden." : "";
+                        snap.forEach(doc => {
+                            container.innerHTML += `<div class="admin-item" style="border-left:4px solid var(--emerald)">
+                                <span><b>${doc.data().show}</b> - ${doc.data().qty} tickets</span>
+                            </div>`;
+                        });
+                    });
+                }
             });
         }
 
-        // --- ADMIN ACTIES ---
-        async function addShow() {
-            await db.collection('shows').add({
-                day: document.getElementById('adm-day').value,
-                time: document.getElementById('adm-time').value
-            });
-            alert("Show added!");
-            loadAdminList();
-        }
-
-        async function addNews() {
-            await db.collection('newsletter').add({
-                title: document.getElementById('adm-news-title').value,
-                img: document.getElementById('adm-news-img').value,
-                text: document.getElementById('adm-news-text').value
-            });
-            alert("News posted!");
-        }
-
-        async function addCast() {
-            await db.collection('cast').add({
-                role: document.getElementById('adm-cast-role').value,
-                name: document.getElementById('adm-cast-name').value
-            });
-            alert("Cast updated!");
-        }
-
+        // --- ADMIN FUNCTIES ---
         async function loadAdminList() {
-            const list = document.getElementById('admin-data-list');
-            list.innerHTML = '<b>Shows:</b>';
+            const container = document.getElementById('admin-list-content');
+            container.innerHTML = "<h4>Lijsten beheren</h4>";
+            
+            // Shows
             const shows = await db.collection('shows').get();
+            container.innerHTML += "<b>Shows:</b>";
             shows.forEach(doc => {
-                list.innerHTML += `<div class="admin-list-item">${doc.data().day} March <button onclick="deleteDoc('shows','${doc.id}')">Del</button></div>`;
+                container.innerHTML += `<div class="admin-item">${doc.data().day} Maart <button class="del-btn" onclick="deleteDoc('shows','${doc.id}')">X</button></div>`;
+            });
+
+            // News
+            const news = await db.collection('newsletter').get();
+            container.innerHTML += "<br><b>Newsletters:</b>";
+            news.forEach(doc => {
+                container.innerHTML += `<div class="admin-item">${doc.data().title} <button class="del-btn" onclick="deleteDoc('newsletter','${doc.id}')">X</button></div>`;
             });
         }
 
         async function deleteDoc(col, id) {
-            await db.collection(col).doc(id).delete();
+            if(confirm("Zeker weten?")) {
+                await db.collection(col).doc(id).delete();
+                loadAdminList();
+            }
+        }
+
+        async function addShow() {
+            await db.collection('shows').add({ day: document.getElementById('adm-day').value, time: document.getElementById('adm-time').value });
             loadAdminList();
         }
 
-        // --- AUDITIES ---
-        async function submitAudition() {
-            const discord = document.getElementById('aud-discord').value;
-            if(!discord) return alert("Discord username is verplicht!");
-            await db.collection('auditions').add({
-                discord: discord,
-                role: document.getElementById('aud-role').value,
-                text: document.getElementById('aud-text').value,
-                timestamp: Date.now()
-            });
-            alert("Submitted!");
-            showSection('theshow');
+        async function addNews() {
+            await db.collection('newsletter').add({ title: document.getElementById('adm-news-title').value, img: document.getElementById('adm-news-img').value, text: document.getElementById('adm-news-text').value });
+            loadAdminList();
         }
 
-        // --- AUTH & ADMIN GATE ---
         function adminGate() {
-            if(prompt("Staff Password:") === "Virtualentertainment2025!") {
+            if(prompt("Wachtwoord:") === "Virtualentertainment2025!") {
                 localStorage.setItem('wicked_admin', 'true');
                 location.reload();
             }
         }
 
-        function adminLogout() {
-            localStorage.removeItem('wicked_admin');
-            location.reload();
-        }
+        function adminLogout() { localStorage.removeItem('wicked_admin'); location.reload(); }
 
         auth.onAuthStateChanged(user => {
-            if(user) document.getElementById('auth-nav').innerText = user.email.split('@')[0];
+            if(user) document.getElementById('auth-nav').innerText = "Account";
             if(localStorage.getItem('wicked_admin') === 'true') {
                 document.getElementById('admin-nav').style.display = 'block';
                 loadAdminList();
@@ -267,7 +262,7 @@
             } catch(err) { alert(err.message); }
         }
 
-        loadAll();
+        loadData();
     </script>
 </body>
 </html>
