@@ -7,91 +7,38 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { 
-            --emerald: #97d72e; 
-            --gold: #d4af37;
-            --glass: rgba(0, 0, 0, 0.85); 
-            --border: rgba(151, 215, 46, 0.3); 
-        }
-
-        body { 
-            margin: 0; 
-            background: linear-gradient(180deg, #050505 0%, #000 70%, #1a3300 100%); 
-            background-attachment: fixed; 
-            color: white; 
-            font-family: 'Montserrat', sans-serif; 
-            overflow-x: hidden;
-        }
-
-        /* Navigatie Upgrade */
-        nav { 
-            background: rgba(0,0,0,0.95); 
-            padding: 15px 60px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 3px solid var(--emerald); 
-            box-shadow: 0 5px 20px rgba(0,255,0,0.2);
-            position: sticky; top: 0; z-index: 1000;
-        }
-
-        .logo { font-family: 'Cinzel'; font-size: 28px; letter-spacing: 5px; text-shadow: 0 0 10px var(--emerald); }
-        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 12px; text-transform: uppercase; cursor: pointer; margin-left: 20px; transition: 0.3s; }
-        .nav-links a:hover { color: white; text-shadow: 0 0 8px var(--emerald); }
-
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        :root { --emerald: #97d72e; --gold: #d4af37; --glass: rgba(0, 0, 0, 0.9); --border: rgba(151, 215, 46, 0.4); }
+        body { margin: 0; background: linear-gradient(180deg, #000 0%, #050505 60%, #1a3300 100%); background-attachment: fixed; color: white; font-family: 'Montserrat', sans-serif; }
         
-        /* Sectie Stijl */
-        .section-box { 
-            background: var(--glass); 
-            border: 1px solid var(--border); 
-            padding: 50px; 
-            border-radius: 15px; 
-            display: none; 
-            backdrop-filter: blur(10px);
-            animation: slideUp 0.6s ease-out;
-        }
-        .section-box.active { display: block; }
+        nav { background: rgba(0,0,0,0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--emerald); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-family: 'Cinzel'; font-size: 24px; letter-spacing: 4px; color: white; }
+        .nav-links a { color: var(--emerald); text-decoration: none; font-weight: 600; font-size: 12px; text-transform: uppercase; cursor: pointer; margin-left: 20px; transition: 0.3s; }
+        .nav-links a:hover { color: white; text-shadow: 0 0 10px var(--emerald); }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+        .section-box { background: var(--glass); border: 1px solid var(--border); padding: 40px; border-radius: 15px; display: none; backdrop-filter: blur(10px); }
+        .section-box.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        h2 { font-family: 'Cinzel'; font-size: 32px; color: var(--emerald); margin-bottom: 30px; border-bottom: 1px solid var(--border); }
+        /* Kalender Styling */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .day { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 15px; text-align: center; border-radius: 8px; transition: 0.3s; }
+        .day.has-show { border-color: var(--emerald); background: rgba(151, 215, 46, 0.1); cursor: pointer; }
+        .day.has-show:hover { background: var(--emerald); color: black; transform: scale(1.05); }
 
-        /* Newsletter Cards */
-        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .news-card { 
-            background: rgba(255,255,255,0.03); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            border: 1px solid #222; 
-            transition: 0.4s;
-        }
-        .news-card:hover { transform: scale(1.02); border-color: var(--emerald); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.07); border: 1px solid #444; color: white; border-radius: 5px; }
+        .btn { background: var(--emerald); color: black; padding: 12px; border: none; font-weight: 800; cursor: pointer; border-radius: 5px; text-transform: uppercase; width: 100%; margin-top: 10px; }
+        .btn:hover { background: white; box-shadow: 0 0 15px var(--emerald); }
+
+        .news-card { background: #111; border: 1px solid #333; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
         .news-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid var(--emerald); }
-        .news-content { padding: 20px; }
-        .news-content h3 { font-family: 'Playfair Display'; margin: 0; color: var(--gold); }
+        .news-info { padding: 15px; }
 
-        /* Input Styles */
-        input, textarea { 
-            width: 100%; padding: 15px; margin: 10px 0; 
-            background: rgba(255,255,255,0.05); border: 1px solid #333; 
-            color: white; border-radius: 5px; font-family: inherit;
-        }
-        input:focus { border-color: var(--emerald); outline: none; }
-
-        .btn { 
-            background: var(--emerald); color: black; padding: 15px; 
-            border: none; font-weight: 800; cursor: pointer; 
-            border-radius: 5px; text-transform: uppercase; width: 100%;
-            letter-spacing: 2px;
-        }
-        .btn:hover { background: white; box-shadow: 0 0 20px var(--emerald); }
-        .logout-btn { background: #660000; color: white; padding: 5px 10px; font-size: 10px; margin-left: 10px; border-radius: 3px; cursor: pointer; }
-
-        .admin-card { background: #0a0a0a; padding: 20px; border: 1px solid gold; border-radius: 10px; margin-bottom: 20px; }
+        .admin-only { border: 2px solid gold !important; }
+        .logout-small { font-size: 10px; color: #ff4444; cursor: pointer; text-decoration: underline; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -101,67 +48,86 @@
         <div class="nav-links">
             <a onclick="showSection('theshow')">The Show</a>
             <a onclick="showSection('newsletter')">News</a>
-            <a onclick="showSection('yourvisit')">Tickets</a>
+            <a onclick="showSection('yourvisit')">My Tickets</a>
             <a onclick="showSection('audities')">Auditions</a>
-            <a id="admin-link" style="display:none; color:gold;" onclick="showSection('admin')">Admin</a>
-            <span id="user-info" style="font-size: 11px; margin-left: 20px;"></span>
-            <a id="login-nav" onclick="showSection('auth-section')">Log In</a>
-            <button id="logout-nav" class="logout-btn" style="display:none;" onclick="logoutUser()">Logout</button>
+            <a id="admin-nav" style="display:none; color:gold;" onclick="showSection('admin-panel')">Wizard Panel</a>
+            <a id="login-link" onclick="showSection('login-page')">Account</a>
+            <span id="user-display" style="font-size: 11px; margin-left: 15px;"></span>
         </div>
     </nav>
 
     <div class="container">
         
-        <section id="newsletter" class="section-box active">
-            <h2>Emerald City Times</h2>
-            <div id="news-container" class="news-grid">
-                </div>
-        </section>
-
-        <section id="auth-section" class="section-box">
-            <h2>Join the Rebellion</h2>
-            <input type="email" id="email" placeholder="Glinda@Oz.com">
-            <input type="password" id="pass" placeholder="Password">
-            <button class="btn" onclick="handleAuth('login')">Enter Oz</button>
-            <button class="btn" style="background:transparent; color:white; border:1px solid white;" onclick="handleAuth('signup')">Create Account</button>
-            <p style="text-align:center; color:gold; margin-top:30px; cursor:pointer;" onclick="adminPrompt()">Witch Master Access</p>
-        </section>
-
-        <section id="audities" class="section-box">
-            <h2>Stage Door Auditions</h2>
-            <div id="aud-form">
-                <input type="text" id="aud-role" placeholder="Target Role">
-                <textarea id="aud-exp" placeholder="Your theatrical background..."></textarea>
-                <button class="btn" onclick="submitAudition()">Submit for Review</button>
+        <section id="login-page" class="section-box active">
+            <h2>Access the Emerald City</h2>
+            <div id="auth-ui">
+                <input type="email" id="email" placeholder="Email Address">
+                <input type="password" id="pass" placeholder="Password">
+                <button class="btn" onclick="handleAuth('login')">Login</button>
+                <button class="btn" style="background:none; border:1px solid white; color:white;" onclick="handleAuth('signup')">Create Account</button>
+                <hr style="margin: 30px 0; border: 0; border-top: 1px solid #333;">
+                <p style="text-align:center; color:gold; cursor:pointer; font-size: 12px;" onclick="showSection('admin-login')">Witch Master Login (Staff Only)</p>
             </div>
-            <div id="aud-status" style="display:none;"></div>
+            <div id="logged-in-ui" style="display:none; text-align:center;">
+                <p id="welcome-msg"></p>
+                <button class="btn" style="background:#444; color:white;" onclick="logout()">Logout</button>
+            </div>
         </section>
 
-        <section id="admin" class="section-box">
-            <h2 style="color:gold;">The Wizard's Control</h2>
-            <button class="btn" style="background:red; color:white; width:auto; padding:5px 15px; margin-bottom:20px;" onclick="adminLogout()">Exit Admin Mode</button>
-            
+        <section id="admin-login" class="section-box">
+            <h2 style="color:gold;">Witch Master Security</h2>
+            <p>Identity Verification Required:</p>
+            <input type="password" id="admin-code" placeholder="Enter Access Key">
+            <button class="btn" style="background:gold;" onclick="verifyAdmin()">Unlock Panel</button>
+            <button class="btn" style="background:none; color:white;" onclick="showSection('login-page')">Back</button>
+        </section>
+
+        <section id="theshow" class="section-box">
+            <h2>March 2026 Schedule</h2>
+            <p>Select a date in green to book your tickets:</p>
+            <div id="calendar" class="calendar-grid"></div>
+
+            <div id="booking-form" style="display:none; margin-top: 40px; border-top: 2px solid var(--emerald); padding-top: 20px;">
+                <h3 id="selected-date-text" style="color:var(--emerald);"></h3>
+                <label>Number of Tickets:</label>
+                <input type="number" id="tix-qty" value="1" min="1" max="10">
+                <button class="btn" onclick="confirmBooking()">Complete Reservation</button>
+            </div>
+        </section>
+
+        <section id="newsletter" class="section-box">
+            <h2>Emerald City News</h2>
+            <div id="news-list"></div>
+        </section>
+
+        <section id="admin-panel" class="section-box admin-only">
+            <h2 style="color:gold;">Wizard Master Control</h2>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
-                <div class="admin-card">
-                    <h3>Write Newsletter</h3>
-                    <input type="text" id="news-title" placeholder="Article Title">
-                    <input type="text" id="news-img-url" placeholder="Image URL (e.g. https://...)">
-                    <textarea id="news-text" placeholder="Tell the story..."></textarea>
-                    <button class="btn" onclick="postNews()">Post to Emerald City</button>
+                <div>
+                    <h3>Post News</h3>
+                    <input type="text" id="new-title" placeholder="Headline">
+                    <input type="text" id="new-img" placeholder="Image URL">
+                    <textarea id="new-text" placeholder="Content..."></textarea>
+                    <button class="btn" onclick="saveNews()">Publish News</button>
                 </div>
-
-                <div class="admin-card">
-                    <h3>Manage Shows</h3>
-                    <input type="number" id="show-day" placeholder="Day">
-                    <input type="text" id="show-time" placeholder="Time (e.g. 19:30)">
-                    <button class="btn" onclick="addShow()">Add Performance</button>
-                    <div id="admin-shows" style="margin-top:20px;"></div>
+                <div>
+                    <h3>Manage Schedule</h3>
+                    <input type="number" id="new-day" placeholder="Day (e.g. 14)">
+                    <input type="text" id="new-time" placeholder="Time (e.g. 19:30)">
+                    <button class="btn" onclick="saveShow()">Add Show</button>
+                    <div id="admin-shows-list" style="margin-top:20px;"></div>
                 </div>
             </div>
+            <button class="btn" style="background:red; color:white; margin-top:40px;" onclick="adminLogout()">Lock Admin Panel</button>
         </section>
 
-        <section id="theshow" class="section-box"><h2>Performance Schedule</h2><div id="calendar-ui" class="news-grid"></div></section>
-        <section id="yourvisit" class="section-box"><h2>Your Enchanted Tickets</h2><div id="tickets-list"></div></section>
+        <section id="yourvisit" class="section-box"><h2>Your Tickets</h2><div id="my-tix"></div></section>
+        <section id="audities" class="section-box">
+            <h2>Audition for a Role</h2>
+            <input type="text" id="aud-role" placeholder="Desired Role">
+            <textarea id="aud-exp" placeholder="Experience..."></textarea>
+            <button class="btn" onclick="submitAudition()">Submit</button>
+        </section>
 
     </div>
 
@@ -178,12 +144,28 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        let selectedShow = "";
+
         function showSection(id) {
             document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
-        // --- AUTH & LOGOUT ---
+        // --- ADMIN LOGIN ---
+        function verifyAdmin() {
+            const code = document.getElementById('admin-code').value;
+            if(code === "Virtualentertainment2025!") {
+                localStorage.setItem('is_wicked_admin', 'true');
+                location.reload();
+            } else { alert("Access Denied."); }
+        }
+
+        function adminLogout() {
+            localStorage.removeItem('is_wicked_admin');
+            location.reload();
+        }
+
+        // --- AUTH ---
         async function handleAuth(type) {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
@@ -194,57 +176,70 @@
             } catch(e) { alert(e.message); }
         }
 
-        function logoutUser() {
-            auth.signOut();
-            location.reload();
-        }
-
-        function adminPrompt() {
-            if(prompt("Identity Key:") === "Virtualentertainment2025!") {
-                localStorage.setItem('wicked_admin', 'true');
-                location.reload();
-            }
-        }
-
-        function adminLogout() {
-            localStorage.removeItem('wicked_admin');
-            location.reload();
-        }
+        function logout() { auth.signOut(); location.reload(); }
 
         auth.onAuthStateChanged(user => {
             if(user) {
-                document.getElementById('user-info').innerText = "Logged in: " + user.email;
-                document.getElementById('login-nav').style.display = 'none';
-                document.getElementById('logout-nav').style.display = 'inline-block';
-                loadUserTickets(user.uid);
+                document.getElementById('auth-ui').style.display = 'none';
+                document.getElementById('logged-in-ui').style.display = 'block';
+                document.getElementById('welcome-msg').innerText = "Welcome, " + user.email;
+                document.getElementById('login-link').innerText = "Account Settings";
+                loadMyTickets(user.uid);
             }
-            if(localStorage.getItem('wicked_admin') === 'true') {
-                document.getElementById('admin-link').style.display = 'inline-block';
-                loadAdminTools();
+            if(localStorage.getItem('is_wicked_admin') === 'true') {
+                document.getElementById('admin-nav').style.display = 'inline-block';
+                loadAdminShows();
             }
         });
 
-        // --- NEWSLETTER SYSTEEM ---
-        async function postNews() {
-            const title = document.getElementById('news-title').value;
-            const img = document.getElementById('news-img-url').value;
-            const text = document.getElementById('news-text').value;
-            await db.collection('newsletter').add({ title, img, text, date: new Date().toLocaleDateString() });
-            alert("Published!");
-            loadNews();
+        // --- CALENDAR & BOOKING ---
+        async function loadCalendar() {
+            const cal = document.getElementById('calendar');
+            const snap = await db.collection('shows').get();
+            const shows = {};
+            snap.forEach(doc => shows[doc.data().day] = doc.data().time);
+            
+            cal.innerHTML = '';
+            for(let i=1; i<=31; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = `day ${shows[i] ? 'has-show' : ''}`;
+                dayDiv.innerHTML = `<b>${i}</b><br><small>${shows[i] || ''}</small>`;
+                if(shows[i]) {
+                    dayDiv.onclick = () => {
+                        selectedShow = `March ${i}th, ${shows[i]}`;
+                        document.getElementById('selected-date-text').innerText = "Selected Performance: " + selectedShow;
+                        document.getElementById('booking-form').style.display = 'block';
+                    };
+                }
+                cal.appendChild(dayDiv);
+            }
         }
 
+        async function confirmBooking() {
+            const user = auth.currentUser;
+            if(!user) return alert("Please login first to book tickets!");
+            await db.collection('bookings').add({
+                uid: user.uid,
+                email: user.email,
+                show: selectedShow,
+                qty: document.getElementById('tix-qty').value,
+                date: new Date().toLocaleDateString()
+            });
+            alert("Reservation Confirmed! Check 'My Tickets'.");
+            showSection('yourvisit');
+        }
+
+        // --- NEWSLETTER ---
         async function loadNews() {
-            const container = document.getElementById('news-container');
-            const snap = await db.collection('newsletter').orderBy('date', 'desc').get();
-            container.innerHTML = '';
+            const list = document.getElementById('news-list');
+            const snap = await db.collection('newsletter').get();
+            list.innerHTML = '';
             snap.forEach(doc => {
                 const d = doc.data();
-                container.innerHTML += `
+                list.innerHTML += `
                     <div class="news-card">
-                        <img src="${d.img || 'https://via.placeholder.com/300x200?text=Wicked'}" class="news-img">
-                        <div class="news-content">
-                            <small>${d.date}</small>
+                        <img src="${d.img}" class="news-img" onerror="this.src='https://via.placeholder.com/800x400?text=Wicked+News'">
+                        <div class="news-info">
                             <h3>${d.title}</h3>
                             <p>${d.text}</p>
                         </div>
@@ -252,34 +247,40 @@
             });
         }
 
-        // --- ADMIN TOOLS ---
-        async function loadAdminTools() {
-            const showList = document.getElementById('admin-shows');
-            const snap = await db.collection('shows').get();
-            showList.innerHTML = '';
-            snap.forEach(doc => {
-                showList.innerHTML += `
-                    <div style="background:#222; padding:10px; margin-top:5px; display:flex; justify-content:space-between;">
-                        <span>${doc.data().day} March - ${doc.data().time}</span>
-                        <button style="color:red; background:none; border:none; cursor:pointer;" onclick="deleteShow('${doc.id}')">X</button>
-                    </div>`;
+        // --- ADMIN ACTIONS ---
+        async function saveNews() {
+            await db.collection('newsletter').add({
+                title: document.getElementById('new-title').value,
+                img: document.getElementById('new-img').value,
+                text: document.getElementById('new-text').value
             });
+            alert("Posted!");
+            loadNews();
         }
 
-        async function deleteShow(id) {
-            await db.collection('shows').doc(id).delete();
-            loadAdminTools();
-        }
-
-        async function addShow() {
+        async function saveShow() {
             await db.collection('shows').add({
-                day: parseInt(document.getElementById('show-day').value),
-                time: document.getElementById('show-time').value
+                day: parseInt(document.getElementById('new-day').value),
+                time: document.getElementById('new-time').value
             });
-            loadAdminTools();
+            location.reload();
         }
 
-        // --- OPSTART ---
+        async function loadAdminShows() {
+            const list = document.getElementById('admin-shows-list');
+            const snap = await db.collection('shows').get();
+            list.innerHTML = '<h4>Active Shows:</h4>';
+            snap.forEach(doc => {
+                list.innerHTML += `<div style="margin-bottom:5px;">${doc.data().day} March (${doc.data().time}) <button onclick="deleteDoc('shows','${doc.id}')">Delete</button></div>`;
+            });
+        }
+
+        async function deleteDoc(col, id) {
+            await db.collection(col).doc(id).delete();
+            location.reload();
+        }
+
+        loadCalendar();
         loadNews();
     </script>
 </body>
