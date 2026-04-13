@@ -3,148 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moulin Rouge! De Musical - Officiële Site</title>
+    <title>Moulin Rouge! De Musical - Spectacular</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        :root { --rouge: #e2000f; --gold: #c5a059; --dark: #000000; --white: #ffffff; }
+        :root { --rouge: #e2000f; --gold: #c5a059; --dark-bg: #050505; --card-bg: rgba(20, 20, 20, 0.8); }
         
-        body { margin: 0; background: var(--dark); color: var(--white); font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
-
-        /* --- DE ICONISCHE DRAAIENDE MOLEN --- */
-        .windmill-header { position: relative; height: 180px; display: flex; justify-content: center; align-items: center; padding-top: 20px; }
-        .windmill-base { width: 80px; z-index: 2; position: relative; }
-        .windmill-blades { 
-            position: absolute; width: 140px; top: 35px; left: 50%; transform: translateX(-50%); 
-            animation: spin 10s linear infinite; z-index: 3; 
-        }
-        @keyframes spin { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
-
-        /* --- NAVIGATIE --- */
-        nav { display: flex; justify-content: center; gap: 40px; padding: 20px 0; border-bottom: 1px solid #222; }
-        nav a { color: var(--gold); text-decoration: none; text-transform: uppercase; font-weight: 700; font-size: 14px; cursor: pointer; }
-        nav a:hover { color: var(--rouge); }
-
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
-
-        /* --- HOOFDPAGINA (LENTEDEAL LAY-OUT) --- */
-        .deal-header { color: var(--gold); font-family: 'Cinzel', serif; font-size: 28px; margin-bottom: 20px; }
-        .deal-content { display: flex; gap: 40px; margin-bottom: 60px; }
-        .deal-text { flex: 1; }
-        .deal-video { flex: 1; background: #111; border: 1px solid #333; position: relative; height: 250px; }
-        .play-button { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: var(--rouge); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        * { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { 
+            margin: 0; 
+            background: var(--dark-bg); 
+            color: white; 
+            font-family: 'Montserrat', sans-serif; 
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at top right, #200000 0%, #050505 60%);
         }
 
-        /* --- TICKET INTERFACE (IDENTIEK AAN SCREENSHOT) --- */
-        .ticket-box { background: var(--white); color: #000; border-radius: 4px; padding: 20px; margin-top: 40px; }
-        .ticket-row { border-bottom: 1px solid #ddd; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
-        .qty-control { display: flex; align-items: center; gap: 15px; }
-        .qty-btn { background: var(--rouge); color: white; border: none; width: 30px; height: 30px; font-size: 20px; cursor: pointer; border-radius: 2px; }
+        /* --- Luxe Navigatie --- */
+        nav { 
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(15px);
+            padding: 20px 60px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-family: 'Cinzel'; font-size: 26px; letter-spacing: 4px; color: var(--gold); text-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
+        .nav-links a { color: white; text-decoration: none; font-weight: 600; font-size: 12px; text-transform: uppercase; margin-left: 25px; letter-spacing: 1px; }
+        .nav-links a:hover { color: var(--rouge); transform: translateY(-2px); }
+
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+
+        /* --- Animaties --- */
+        .reveal { animation: revealEffect 0.8s ease-out forwards; opacity: 0; }
+        @keyframes revealEffect { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Hoofdpagina Layout --- */
+        .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .deal-card { background: var(--card-bg); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 15px; padding: 40px; position: relative; overflow: hidden; }
+        .deal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--rouge); }
+
+        .video-thumb { 
+            width: 100%; height: 350px; background: #111; border-radius: 15px; 
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #333; position: relative; cursor: pointer;
+        }
+        .video-thumb:hover { border-color: var(--gold); transform: scale(1.02); }
+        .play-btn { width: 80px; height: 80px; background: var(--rouge); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px var(--rouge); }
+
+        /* --- Ticket UI --- */
+        .ticket-box { background: white; color: black; border-radius: 20px; padding: 30px; margin-top: 50px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+        .cat-item { 
+            display: flex; justify-content: space-between; padding: 20px; 
+            border: 2px solid #eee; border-radius: 12px; margin-bottom: 15px; cursor: pointer;
+        }
+        .cat-item:hover, .cat-item.active { border-color: var(--rouge); background: #fff9f9; transform: translateX(10px); }
+
+        /* --- Wizard Panel (Nieuw Dashboard) --- */
+        .admin-box { background: #0a0a0a; border: 2px solid var(--gold); border-radius: 15px; padding: 40px; }
+        .admin-nav { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 15px; }
+        .tab-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+        .tab-btn.active { background: var(--gold); color: black; }
         
-        .cat-row { border-bottom: 1px solid #ddd; padding: 20px 0; display: grid; grid-template-columns: 1fr 1fr 1fr auto; align-items: center; cursor: pointer; }
-        .cat-row:hover { background: #f9f9f9; }
-        .price-label { font-weight: bold; }
-        .radio-custom { width: 20px; height: 20px; accent-color: var(--rouge); }
-
-        .btn-checkout { 
-            background: var(--rouge); color: white; width: 100%; padding: 15px; border: none; 
-            margin-top: 20px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
-        }
+        .admin-item { background: #151515; padding: 15px; border-radius: 8px; border: 1px solid #333; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .del-btn { background: var(--rouge); color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
 
         .section { display: none; }
         .section.active { display: block; }
+
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 15px 35px; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        .btn-gold:hover { background: white; box-shadow: 0 0 20px white; }
+
+        input, textarea { background: #111; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; margin: 10px 0; }
     </style>
 </head>
 <body>
 
-    <div class="windmill-header">
-        <img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png" class="windmill-blades" alt="Wieken">
-        <img src="https://i.ibb.co/1a2ac0/moulin-rouge-base.png" class="windmill-base" alt="Molen">
-    </div>
-
     <nav>
-        <a onclick="openSection('home')">Home</a>
-        <a onclick="openSection('tickets')">Tickets</a>
-        <a onclick="openSection('casting')">Casting Call</a>
+        <div class="logo">MOULIN ROUGE!</div>
+        <div class="nav-links">
+            <a onclick="showSection('home')">Home</a>
+            <a onclick="showSection('tickets')">Tickets & Deals</a>
+            <a onclick="showSection('casting')">Casting Call</a>
+            <a id="admin-nav-link" style="display:none; color: var(--gold);" onclick="showSection('admin')">Admin</a>
+            <a onclick="adminLogin()" style="cursor: pointer; color: var(--rouge);">Staff Login</a>
+        </div>
     </nav>
 
     <div class="container">
         
-        <div id="home" class="section active">
-            <h1 class="deal-header">LENTEDEAL TIJDELIJK AANBOD</h1>
-            <div class="deal-content">
-                <div class="deal-text">
-                    <p><b>Profiteer van voordeel</b> op tickets voor Moulin Rouge! De Musical met een <b>Gratis Rangupgrade</b>. Deze aanbieding is tijdelijk, dus grijp je kans.</p>
-                    <p>Moulin Rouge! De Musical is nu te zien in het Beatrix Theater Utrecht.</p>
-                    <ul>
-                        <li>Meerdere rangen beschikbaar.</li>
-                        <li>Beperkt boekbaar.</li>
+        <div id="home" class="section active reveal">
+            <div class="hero-grid">
+                <div class="deal-card">
+                    <h1 style="font-family: 'Cinzel'; color: var(--gold);">LENTEDEAL TIJDELIJK AANBOD</h1>
+                    <p style="font-size: 18px; line-height: 1.8;">Beleef de magie van Moulin Rouge met een <b>Gratis Rangupgrade</b>. Dompel je onder in de boheemse wereld van liefde en passie.</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;">✨ Bekroond met 5 Musical Awards</li>
+                        <li style="margin-bottom: 10px;">✨ Spectaculaire Rang 1 ervaring</li>
                     </ul>
-                    <button style="background:var(--rouge); color:white; border:none; padding:10px 20px; font-weight:bold; cursor:pointer;">Info & tickets</button>
-                    <p style="margin-top:20px;">✓ Bekroond met 5 Musical Awards</p>
-                    <p>✓ Verschillende middag- en avondvoorstellingen</p>
+                    <button class="btn-gold" onclick="showSection('tickets')">Boek nu je deal</button>
                 </div>
-                <div class="deal-video">
-                    <div class="play-button"><div style="width:0; height:0; border-top:10px solid transparent; border-bottom:10px solid transparent; border-left:15px solid white; margin-left:5px;"></div></div>
+                <div class="video-thumb">
+                    <div class="play-btn"><div style="width:0; height:0; border-top:15px solid transparent; border-bottom:15px solid transparent; border-left:25px solid white; margin-left:8px;"></div></div>
                 </div>
             </div>
 
-            <h1 class="deal-header">BEKIJK NU DE CLIP VAN COME WHAT MAY!</h1>
-            <div style="background:#111; height:400px; border:1px solid #333; display:flex; align-items:center; justify-content:center;">
-                 <div class="play-button" style="width:80px; height:80px;"></div>
+            <div style="margin-top: 80px; text-align: center;" class="reveal">
+                <h1 style="font-family: 'Cinzel'; color: var(--gold);">COME WHAT MAY</h1>
+                <div class="video-thumb" style="height: 500px; max-width: 900px; margin: 30px auto;">
+                     <div class="play-btn"></div>
+                </div>
             </div>
         </div>
 
         <div id="tickets" class="section">
-            <div class="ticket-box">
-                <div class="ticket-row">
-                    <span>1. Kies het aantal items:</span>
-                    <div class="qty-control">
-                        <button class="qty-btn" onclick="updateQty(-1)">-</button>
-                        <span id="item-qty" style="font-weight:bold; font-size:18px;">1</span>
-                        <button class="qty-btn" onclick="updateQty(1)">+</button>
-                    </div>
+            <div class="ticket-box reveal">
+                <h2 style="margin-bottom: 30px;">Selecteer je tickets</h2>
+                
+                <div class="cat-item" onclick="selectCat('Premium', 40, this)">
+                    <div><strong>Premium Rang</strong><br><small>Beste zicht in de zaal</small></div>
+                    <div style="font-weight: bold; font-size: 20px;">R$ 40</div>
+                </div>
+                <div class="cat-item" onclick="selectCat('1e Rang', 30, this)">
+                    <div><strong>1e Rang</strong><br><small>Geweldig spektakel</small></div>
+                    <div style="font-weight: bold; font-size: 20px;">R$ 30</div>
+                </div>
+                <div class="cat-item" onclick="selectCat('2e Rang', 0, this)">
+                    <div><strong>2e Rang</strong><br><small>Standaard zicht</small></div>
+                    <div style="font-weight: bold; font-size: 20px;">GRATIS</div>
                 </div>
 
-                <div class="ticket-row" style="border:none;">
-                    <span>2. Kies je (stoel)categorie:</span>
+                <div style="margin-top: 25px;">
+                    <input type="text" id="roblox-user" placeholder="Roblox Gebruikersnaam" style="color: black; background: #f0f0f0;">
+                    <button class="btn-gold" style="width: 100%; margin-top: 15px; background: var(--rouge); color: white;" onclick="checkout()">Reserveer Tickets</button>
                 </div>
+            </div>
+        </div>
 
-                <div class="cat-row" onclick="selectCat('Premium', 40)">
-                    <span class="price-label">Premium</span>
-                    <span style="color:#666; font-size:12px;">Regulier</span>
-                    <span style="text-align:right; font-weight:bold;">R$ 40,00</span>
-                    <input type="radio" name="cat" class="radio-custom" id="rad-Premium">
+        <div id="casting" class="section">
+            <div class="deal-card reveal" style="max-width: 600px; margin: auto;">
+                <h2 style="color: var(--gold);">Casting Call</h2>
+                <input type="text" id="aud-discord" placeholder="Discord Naam">
+                <input type="text" id="aud-role" placeholder="Welke Rol?">
+                <textarea id="aud-exp" placeholder="Jouw ervaring..."></textarea>
+                <button class="btn-gold" style="width: 100%;" onclick="submitAudition()">Verstuur Auditie</button>
+            </div>
+        </div>
+
+        <div id="admin" class="section">
+            <div class="admin-box reveal">
+                <div class="admin-nav">
+                    <button class="tab-btn active" onclick="loadAdminData('bookings')">Boekingen</button>
+                    <button class="tab-btn" onclick="loadAdminData('auditions')">Audities</button>
+                    <button class="tab-btn" onclick="logout()">Logout</button>
                 </div>
-
-                <div class="cat-row" onclick="selectCat('1e rang', 34.50)">
-                    <span class="price-label">1e rang</span>
-                    <span style="color:#666; font-size:12px;">Regulier</span>
-                    <span style="text-align:right; font-weight:bold;">R$ 34,50</span>
-                    <input type="radio" name="cat" class="radio-custom" id="rad-1e">
-                </div>
-
-                <div class="cat-row" onclick="selectCat('2e rang', 30.50)">
-                    <span class="price-label">2e rang</span>
-                    <span style="color:#666; font-size:12px;">Regulier</span>
-                    <span style="text-align:right; font-weight:bold;">R$ 30,50</span>
-                    <input type="radio" name="cat" class="radio-custom" id="rad-2e">
-                </div>
-
-                <button class="btn-checkout" onclick="processOrder()">
-                    🛒 <span id="btn-text">1 Ticket, R$ 40,00</span>
-                </button>
+                <div id="admin-content"></div>
             </div>
         </div>
 
     </div>
 
     <script>
-        // Firebase configuratie blijft hetzelfde
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCCm6vZCE1KH1SnclU7NHF2BmeOUW_suio",
             authDomain: "wickedrobloxofficial.firebaseapp.com",
@@ -156,48 +180,84 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let qty = 1;
-        let selectedPrice = 40;
-        let selectedName = "Premium";
-
-        function openSection(id) {
+        function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id === 'admin') loadAdminData('bookings');
         }
 
-        function updateQty(val) {
-            qty = Math.max(1, qty + val);
-            document.getElementById('item-qty').innerText = qty;
-            updateTotal();
-        }
+        let selectedPrice = 0;
+        let selectedName = "";
 
-        function selectCat(name, price) {
+        function selectCat(name, price, el) {
             selectedName = name;
             selectedPrice = price;
-            // Uncheck others (simulated radio behavior)
-            document.getElementById('rad-Premium').checked = (name === 'Premium');
-            document.getElementById('rad-1e').checked = (name === '1e rang');
-            document.getElementById('rad-2e').checked = (name === '2e rang');
-            updateTotal();
+            document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
         }
 
-        function updateTotal() {
-            let total = (qty * selectedPrice).toFixed(2);
-            document.getElementById('btn-text').innerText = `${qty} Ticket${qty > 1 ? 's' : ''}, R$ ${total}`;
+        async function checkout() {
+            const user = document.getElementById('roblox-user').value;
+            if(!user || !selectedName) return alert("Kies een rang en voer je naam in!");
+            await db.collection('bookings').add({ user, rang: selectedName, ts: Date.now() });
+            alert("Reservering gelukt!");
+            location.reload();
         }
 
-        async function processOrder() {
-            const user = prompt("Voer je Roblox Username in voor de reservering:");
-            if(!user) return;
+        async function submitAudition() {
+            const discord = document.getElementById('aud-discord').value;
+            const role = document.getElementById('aud-role').value;
+            const exp = document.getElementById('aud-exp').value;
+            await db.collection('auditions').add({ discord, role, exp, ts: Date.now() });
+            alert("Auditie verstuurd!");
+            showSection('home');
+        }
+
+        // --- Dashboard Functies ---
+        function adminLogin() {
+            const pass = prompt("Manager Wachtwoord:");
+            if(pass === "Virtual2025!") {
+                localStorage.setItem('moulin_admin', 'true');
+                document.getElementById('admin-nav-link').style.display = 'inline-block';
+                showSection('admin');
+            } else {
+                alert("Verkeerd wachtwoord!");
+            }
+        }
+
+        async function loadAdminData(type) {
+            const container = document.getElementById('admin-content');
+            container.innerHTML = "Laden...";
+            const snap = await db.collection(type).orderBy('ts', 'desc').get();
+            container.innerHTML = "";
             
-            await db.collection('bookings').add({
-                user: user,
-                category: selectedName,
-                quantity: qty,
-                total: qty * selectedPrice,
-                timestamp: Date.now()
+            snap.forEach(doc => {
+                const d = doc.data();
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                if(type === 'bookings') {
+                    item.innerHTML = `<span><b>${d.user}</b> - ${d.rang}</span> <button class="del-btn" onclick="deleteDoc('bookings','${doc.id}')">Verwijder</button>`;
+                } else {
+                    item.innerHTML = `<span><b>${d.discord}</b> - Rol: ${d.role}</span> <button class="del-btn" onclick="deleteDoc('auditions','${doc.id}')">Verwijder</button>`;
+                }
+                container.appendChild(item);
             });
-            alert("Reservering voltooid! We zien je in de Moulin Rouge.");
+        }
+
+        async function deleteDoc(col, id) {
+            if(confirm("Zeker weten?")) {
+                await db.collection(col).doc(id).delete();
+                loadAdminData(col);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('moulin_admin');
+            location.reload();
+        }
+
+        if(localStorage.getItem('moulin_admin') === 'true') {
+            document.getElementById('admin-nav-link').style.display = 'inline-block';
         }
     </script>
 </body>
