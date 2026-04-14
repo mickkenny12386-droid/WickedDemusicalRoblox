@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moulin Rouge! | A Virtual Entertainment Production</title>
+    <title>Moulin Rouge! | Virtual Management System</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
@@ -12,196 +12,141 @@
         :root { 
             --rouge: #9e0000; 
             --gold: #d4af37; 
-            --gold-bright: #f9e29b;
-            --dark-bg: #030303; 
-            --card-bg: rgba(15, 15, 15, 0.96);
-            --border: rgba(212, 175, 55, 0.4);
+            --dark-bg: #050000; 
+            --card-bg: rgba(20, 0, 0, 0.9);
+            --border: rgba(212, 175, 55, 0.3);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.4s ease; }
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: all 0.3s ease; }
         
         body { 
-            background: var(--dark-bg); 
+            background: var(--dark-bg);
+            /* Background inspired by the damask pattern in the provided image */
+            background-image: url('https://www.transparenttextures.com/patterns/black-linen-2.png'), radial-gradient(circle, #3a0000 0%, #050000 100%);
             color: white; 
             font-family: 'Montserrat', sans-serif; 
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at top right, #280000 0%, #030303 85%);
         }
 
-        /* --- Navigation --- */
         nav { 
-            background: rgba(0,0,0,0.98); 
-            padding: 20px 60px; 
+            background: rgba(0,0,0,0.95); 
+            padding: 15px 50px; 
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 2px solid var(--gold);
             position: sticky; top: 0; z-index: 1000;
         }
-        .logo-container { display: flex; align-items: center; }
-        .logo-img { 
-            height: 65px; /* Adjust height as needed */
-            width: auto; 
-            filter: drop-shadow(0 0 10px var(--gold));
-            cursor: pointer;
-        }
+        .logo-img { height: 60px; filter: drop-shadow(0 0 10px var(--gold)); cursor: pointer; }
 
-        .nav-links a { color: white; text-decoration: none; margin-left: 25px; font-weight: 700; font-size: 11px; text-transform: uppercase; cursor: pointer; letter-spacing: 2px; }
-        .nav-links a:hover { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; }
+        .nav-links a:hover { color: var(--gold); }
 
-        .container { max-width: 1300px; margin: 40px auto; padding: 30px; border: 1px solid var(--border); border-radius: 15px; background: rgba(0,0,0,0.4); box-shadow: 0 0 60px rgba(0,0,0,0.5); }
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
 
-        /* --- Hero Section --- */
-        .hero-box { background: var(--card-bg); padding: 60px; border: 1px solid var(--border); border-radius: 10px; position: relative; overflow: hidden; }
-        .hero-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--rouge); }
-        
-        h1 { font-family: 'Playfair Display'; font-size: 55px; color: var(--gold-bright); margin-bottom: 25px; font-style: italic; text-transform: uppercase; }
-        .lang-note { background: var(--rouge); color: white; padding: 5px 15px; font-size: 12px; font-weight: 700; display: inline-block; margin-top: 20px; border-radius: 3px; }
+        /* --- Calendar Styling (Image 5 Reference) --- */
+        .calendar-header { text-align: center; font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 32px; margin-bottom: 20px; text-transform: uppercase; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--border); }
+        .cal-day-label { background: #000; padding: 10px; text-align: center; font-weight: bold; font-size: 12px; color: var(--gold); }
+        .cal-cell { min-height: 120px; background: rgba(0,0,0,0.6); border: 1px solid #222; padding: 5px; position: relative; }
+        .cal-date { font-size: 12px; color: #666; }
+        .show-tag { background: var(--rouge); font-size: 10px; padding: 4px; margin-top: 5px; border-radius: 2px; border-left: 3px solid var(--gold); }
 
-        /* --- Photo Book --- */
-        .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
-        .photo-item { 
-            background: #fff; padding: 15px 15px 50px 15px; transform: rotate(-1.5deg); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7); border-radius: 2px; cursor: pointer;
-        }
-        .photo-item:nth-child(even) { transform: rotate(2deg); }
-        .photo-item img { width: 100%; height: 220px; object-fit: cover; filter: sepia(0.2); }
-        .photo-item:hover { transform: scale(1.08) rotate(0deg); z-index: 10; filter: none; }
-        .photo-item::after { content: 'Spectacular Spectacular'; font-family: 'Playfair Display'; color: #333; display: block; text-align: center; margin-top: 15px; font-size: 14px; }
+        /* --- Photo Book (Alternating) --- */
+        .book-row { display: flex; align-items: center; gap: 40px; margin-bottom: 60px; opacity: 0; transform: translateY(20px); }
+        .book-row.reveal { opacity: 1; transform: translateY(0); }
+        .book-row:nth-child(even) { flex-direction: row-reverse; }
+        .book-text { flex: 1; }
+        .book-img { flex: 1; border: 5px solid white; box-shadow: 10px 10px 30px rgba(0,0,0,0.8); max-height: 400px; object-fit: cover; }
 
-        /* --- Tickets --- */
-        .ticket-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 30px; }
-        .ticket-card { background: #fff; color: #000; padding: 40px; border-radius: 5px; text-align: center; cursor: pointer; border-bottom: 8px solid var(--dark-bg); }
-        .ticket-card:hover { transform: translateY(-10px); border-bottom-color: var(--rouge); }
-        .ticket-card.active { border-bottom-color: var(--rouge); box-shadow: 0 0 30px var(--rouge); }
-        .ticket-card h3 { font-family: 'Cinzel Decorative'; font-size: 22px; color: var(--rouge); margin-bottom: 10px; }
-
-        /* --- Admin Suite --- */
-        .admin-panel { background: #0a0a0a; border: 2px solid var(--gold); padding: 40px; border-radius: 12px; }
-        .tab-bar { display: flex; gap: 30px; border-bottom: 1px solid #333; margin-bottom: 30px; padding-bottom: 15px; }
-        .tab-btn { color: var(--gold); cursor: pointer; font-weight: 700; font-size: 14px; text-transform: uppercase; opacity: 0.5; }
+        /* --- Admin --- */
+        .admin-panel { background: #111; border: 2px solid var(--gold); padding: 30px; border-radius: 10px; }
+        .tab-btn { background: none; border: none; color: var(--gold); padding: 10px 20px; cursor: pointer; font-weight: bold; opacity: 0.5; }
         .tab-btn.active { opacity: 1; border-bottom: 2px solid var(--gold); }
-        
-        .data-list { background: #111; padding: 20px; border-radius: 8px; border: 1px solid #222; margin-top: 15px; }
-        .data-row { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #222; }
-        .del-btn { background: var(--rouge); color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; }
-
-        .btn-gold { 
-            background: var(--gold); color: black; padding: 20px 45px; border: none; 
-            font-weight: 700; text-transform: uppercase; cursor: pointer; border-radius: 4px; letter-spacing: 1px;
-        }
-        .btn-gold:hover { background: white; box-shadow: 0 0 20px white; }
 
         .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section.active { display: block; }
 
-        input, textarea { width: 100%; padding: 15px; margin: 10px 0; background: #181818; border: 1px solid #333; color: white; border-radius: 5px; font-family: 'Montserrat'; }
+        .btn-rouge { background: var(--rouge); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo-container">
-            <img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png" alt="Moulin Rouge Logo" class="logo-img" onclick="showPage('home')">
-        </div>
+        <img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png" class="logo-img" onclick="showPage('home')">
         <div class="nav-links">
             <a onclick="showPage('home')">Home</a>
-            <a onclick="showPage('tickets')">Tickets</a>
-            <a onclick="showPage('gallery')">Photo Book</a>
+            <a onclick="showPage('schedule')">Schedule</a>
+            <a onclick="showPage('photobook')">Story</a>
             <a onclick="showPage('casting')">Casting</a>
-            <a id="admin-link" style="display:none; color: var(--gold);" onclick="showPage('admin')">Management</a>
-            <a onclick="adminLogin()" style="color: var(--rouge);">Staff Login</a>
+            <a id="admin-link" style="display:none; color: var(--gold);" onclick="showPage('admin')">Dashboard</a>
+            <a onclick="adminLogin()" style="color: var(--rouge);">Staff</a>
         </div>
     </nav>
 
     <div class="container">
         
         <div id="home" class="section active">
-            <div class="hero-box">
-                <span style="color:var(--gold); font-weight:bold; letter-spacing:3px; font-size:11px;">A VIRTUAL ENTERTAINMENT PRODUCTION</span>
-                <h1>GET READY TO ROUGE!</h1>
-                <p style="font-size: 18px; line-height: 1.8; color: #ddd; max-width: 900px;">
-                    Prepare for a world of beauty and romance, of excitement, drama and excess! An extravagant world where all bohemians allow themselves to be seduced. Welcome to Moulin Rouge! The Musical.<br><br>
-                    Baz Luhrmann's revolutionary film comes to life in a unique mash-up musical, featuring over 70 well-known songs. Winner of no less than 10 Tony Awards® and a tribute to truth, beauty, freedom and of course love. Moulin Rouge! The Musical is much more than a musical; it's a state of mind!
-                </p>
-                <div class="lang-note">PLEASE NOTE: ALL SONGS ARE PERFORMED IN ENGLISH</div>
-                <br><br>
-                <button class="btn-gold" onclick="showPage('tickets')">Book Your Experience</button>
-            </div>
+            <h1 style="font-family:'Playfair Display'; font-size: 50px; text-align: center; color: var(--gold);">GET READY TO ROUGE!</h1>
+            <p style="text-align:center; max-width: 800px; margin: 20px auto; line-height: 1.6;">
+                Baz Luhrmann's revolutionary film comes to life in a unique mash-up musical. 
+                Experience a world of beauty, freedom, and love.
+            </p>
         </div>
 
-        <div id="gallery" class="section">
-            <h1 style="text-align:center;">The Photo Book</h1>
-            <div class="photo-grid">
-                <div class="photo-item"><img src="https://i.ibb.co/F44P6Gq/show.jpg"></div>
-                <div class="photo-item"><img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png"></div>
-                <div class="photo-item"><img src="https://i.ibb.co/F44P6Gq/show.jpg"></div>
-                <div class="photo-item"><img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png"></div>
-            </div>
+        <div id="schedule" class="section">
+            <div class="calendar-header">October 2026</div>
+            <div class="calendar-grid" id="calendar-body">
+                <div class="cal-day-label">Mon</div><div class="cal-day-label">Tue</div><div class="cal-day-label">Wed</div>
+                <div class="cal-day-label">Thu</div><div class="cal-day-label">Fri</div><div class="cal-day-label">Sat</div>
+                <div class="cal-day-label">Sun</div>
+                </div>
         </div>
 
-        <div id="tickets" class="section">
-            <h1 style="text-align: center;">Select Your Seating</h1>
-            <div class="ticket-grid">
-                <div class="ticket-card" id="card-cancan" onclick="selectRank('Can Can Seats', 'cancan')">
-                    <h3>Can Can Seats</h3>
-                    <div style="font-size:28px; font-weight:bold;">R$ <span id="p-cancan">0</span></div>
-                    <small>Availability: <span id="l-cancan">0</span> left</small>
+        <div id="photobook" class="section">
+            <div id="book-content">
                 </div>
-                <div class="ticket-card" id="card-diamond" onclick="selectRank('Diamond', 'diamond')">
-                    <h3>Diamond</h3>
-                    <div style="font-size:28px; font-weight:bold;">R$ <span id="p-diamond">0</span></div>
-                    <small>Availability: <span id="l-diamond">0</span> left</small>
-                </div>
-                <div class="ticket-card" id="card-bohemian" onclick="selectRank('Bohemian', 'bohemian')">
-                    <h3>Bohemian</h3>
-                    <div style="font-size:28px; font-weight:bold;">R$ <span id="p-bohemian">0</span></div>
-                    <small>Availability: <span id="l-bohemian">0</span> left</small>
-                </div>
-            </div>
-
-            <div id="booking-form" style="display:none; margin-top:40px; padding:40px; border: 1px solid var(--gold); background: var(--card-bg);">
-                <h2 id="sel-title" style="color:var(--gold); font-family: 'Playfair Display';"></h2>
-                <input type="text" id="book-user" placeholder="Roblox Username">
-                <input type="number" id="book-qty" value="1" min="1">
-                <button class="btn-gold" style="width:100%; margin-top:20px;" onclick="confirmBooking()">Confirm Reservation</button>
-            </div>
         </div>
 
         <div id="casting" class="section">
-            <div class="hero-box" style="max-width: 800px; margin: auto;">
-                <h1>Casting Call</h1>
-                <p>Join the spectacular. We are looking for bohemians with passion.</p>
-                <input type="text" id="aud-discord" placeholder="Discord Username">
-                <input type="text" id="aud-role" placeholder="Desired Role">
-                <textarea id="aud-exp" placeholder="Tell us about your experience..." style="height: 150px;"></textarea>
-                <button class="btn-gold" style="width:100%" onclick="submitAudition()">Submit Audition</button>
+            <div style="max-width: 600px; margin: auto; background: var(--card-bg); padding: 40px; border: 1px solid var(--gold);">
+                <h2 style="color:var(--gold); margin-bottom:20px;">Audition Application</h2>
+                <input type="text" id="aud-name" placeholder="Full Name">
+                <input type="text" id="aud-discord" placeholder="Discord User">
+                <label>Can you attend all scheduled rehearsals?</label>
+                <select id="aud-rehearsals">
+                    <option value="yes">Yes, I am fully available</option>
+                    <option value="no">No, I have some conflicts</option>
+                </select>
+                <textarea id="aud-exp" placeholder="Tell us about your musical experience..."></textarea>
+                <button class="btn-rouge" style="width:100%" onclick="submitAudition()">Submit Application</button>
             </div>
         </div>
 
         <div id="admin" class="section">
             <div class="admin-panel">
-                <div class="tab-bar">
-                    <div class="tab-btn active" id="tab-config" onclick="switchTab('config')">System</div>
-                    <div class="tab-btn" id="tab-auditions" onclick="switchTab('auditions')">Auditions</div>
-                    <div class="tab-btn" id="tab-bookings" onclick="switchTab('bookings')">Bookings</div>
-                    <div class="tab-btn" onclick="logout()" style="color:var(--rouge); margin-left:auto;">Logout</div>
+                <div style="margin-bottom: 20px;">
+                    <button class="tab-btn active" onclick="switchAdmin('shows')">Schedule Shows</button>
+                    <button class="tab-btn" onclick="switchAdmin('book-edit')">Edit Photobook</button>
+                    <button class="tab-btn" onclick="switchAdmin('view-auditions')">View Auditions</button>
                 </div>
 
-                <div id="admin-config">
-                    <h3 style="color:var(--gold); margin-bottom:15px;">Pricing & Capacity</h3>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <input type="number" id="set-p-cancan" placeholder="Price Can Can">
-                        <input type="number" id="set-l-cancan" placeholder="Max Seats Can Can">
-                        <input type="number" id="set-p-diamond" placeholder="Price Diamond">
-                        <input type="number" id="set-l-diamond" placeholder="Max Seats Diamond">
-                        <input type="number" id="set-p-bohemian" placeholder="Price Bohemian">
-                        <input type="number" id="set-l-bohemian" placeholder="Max Seats Bohemian">
-                    </div>
-                    <button class="btn-gold" style="margin-top:20px;" onclick="saveSettings()">Apply Changes</button>
+                <div id="admin-shows">
+                    <h3>Plan a Show</h3>
+                    <input type="date" id="new-show-date">
+                    <input type="text" id="new-show-title" placeholder="Show Title (e.g. Preview, Opening Night)">
+                    <textarea id="new-show-desc" placeholder="Show Description"></textarea>
+                    <button class="btn-rouge" onclick="addShow()">Add to Calendar</button>
                 </div>
 
-                <div id="admin-data" style="display:none;">
-                    <div id="data-container"></div>
+                <div id="admin-book-edit" style="display:none;">
+                    <h3>Manage Pages</h3>
+                    <input type="text" id="page-img" placeholder="Image URL">
+                    <textarea id="page-text" placeholder="Page Description"></textarea>
+                    <button class="btn-rouge" onclick="addPage()">Add Page</button>
+                    <div id="admin-page-list" style="margin-top:20px;"></div>
+                </div>
+
+                <div id="admin-auditions" style="display:none;">
+                    <div id="audition-data-list"></div>
                 </div>
             </div>
         </div>
@@ -209,6 +154,7 @@
     </div>
 
     <script>
+        // Use your existing Firebase config from the previous prompt
         const firebaseConfig = {
             apiKey: "AIzaSyCCm6vZCE1KH1SnclU7NHF2BmeOUW_suio",
             authDomain: "wickedrobloxofficial.firebaseapp.com",
@@ -220,115 +166,114 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let settings = {};
-        let selectedType = "";
-
         function showPage(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id === 'schedule') renderCalendar();
+            if(id === 'photobook') loadPhotobook();
         }
 
-        async function loadSettings() {
-            const doc = await db.collection('config').doc('prices').get();
-            if(doc.exists) {
-                settings = doc.data();
-                ['cancan', 'diamond', 'bohemian'].forEach(t => {
-                    document.getElementById(`p-${t}`).innerText = settings[`p_${t}`] || 0;
-                    document.getElementById(`l-${t}`).innerText = settings[`l_${t}`] || 0;
-                });
+        // --- CALENDAR LOGIC ---
+        async function renderCalendar() {
+            const container = document.getElementById('calendar-body');
+            // Keep labels
+            container.innerHTML = '<div class="cal-day-label">Mon</div><div class="cal-day-label">Tue</div><div class="cal-day-label">Wed</div><div class="cal-day-label">Thu</div><div class="cal-day-label">Fri</div><div class="cal-day-label">Sat</div><div class="cal-day-label">Sun</div>';
+            
+            const showsSnap = await db.collection('shows').get();
+            const shows = {};
+            showsSnap.forEach(doc => shows[doc.data().date] = doc.data());
+
+            for(let i=1; i<=31; i++) {
+                const dateStr = `2026-10-${i.toString().padStart(2, '0')}`;
+                const cell = document.createElement('div');
+                cell.className = 'cal-cell';
+                cell.innerHTML = `<div class="cal-date">${i}</div>`;
+                if(shows[dateStr]) {
+                    cell.innerHTML += `<div class="show-tag"><b>${shows[dateStr].title}</b><br><small>${shows[dateStr].desc}</small></div>`;
+                }
+                container.appendChild(cell);
             }
         }
 
-        async function saveSettings() {
-            const updated = {
-                p_cancan: parseInt(document.getElementById('set-p-cancan').value),
-                l_cancan: parseInt(document.getElementById('set-l-cancan').value),
-                p_diamond: parseInt(document.getElementById('set-p-diamond').value),
-                l_diamond: parseInt(document.getElementById('set-l-diamond').value),
-                p_bohemian: parseInt(document.getElementById('set-p-bohemian').value),
-                l_bohemian: parseInt(document.getElementById('set-l-bohemian').value),
-            };
-            await db.collection('config').doc('prices').set(updated);
-            alert("Settings Updated!");
-            loadSettings();
+        async function addShow() {
+            const date = document.getElementById('new-show-date').value;
+            const title = document.getElementById('new-show-title').value;
+            const desc = document.getElementById('new-show-desc').value;
+            await db.collection('shows').add({ date, title, desc });
+            alert("Show Added!");
+            renderCalendar();
         }
 
-        function selectRank(name, type) {
-            selectedType = type;
-            document.querySelectorAll('.ticket-card').forEach(c => c.classList.remove('active'));
-            document.getElementById(`card-${type}`).classList.add('active');
-            document.getElementById('booking-form').style.display = 'block';
-            document.getElementById('sel-title').innerText = "Reserving: " + name;
-        }
-
-        async function confirmBooking() {
-            const user = document.getElementById('book-user').value;
-            const qty = parseInt(document.getElementById('book-qty').value);
-            if(!user || settings[`l_${selectedType}`] < qty) return alert("Please check username or seat availability!");
-            await db.collection('bookings').add({ user, rank: selectedType, qty, ts: Date.now() });
-            settings[`l_${selectedType}`] -= qty;
-            await db.collection('config').doc('prices').update(settings);
-            alert("Reservation Successful!");
-            location.reload();
-        }
-
-        async function submitAudition() {
-            const discord = document.getElementById('aud-discord').value;
-            const role = document.getElementById('aud-role').value;
-            const exp = document.getElementById('aud-exp').value;
-            await db.collection('auditions').add({ discord, role, exp, ts: Date.now() });
-            alert("Audition Submitted!");
-            showPage('home');
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-            if(tab === 'config') {
-                document.getElementById('admin-config').style.display = 'block';
-                document.getElementById('admin-data').style.display = 'none';
-            } else {
-                document.getElementById('admin-config').style.display = 'none';
-                document.getElementById('admin-data').style.display = 'block';
-                loadAdminData(tab);
-            }
-        }
-
-        async function loadAdminData(collection) {
-            const container = document.getElementById('data-container');
+        // --- PHOTOBOOK LOGIC ---
+        async function loadPhotobook() {
+            const container = document.getElementById('book-content');
             container.innerHTML = "Loading...";
-            const snap = await db.collection(collection).orderBy('ts', 'desc').get();
+            const snap = await db.collection('photobook').get();
             container.innerHTML = "";
             snap.forEach(doc => {
                 const d = doc.data();
-                const div = document.createElement('div');
-                div.className = 'data-row';
-                div.innerHTML = collection === 'auditions' ? 
-                    `<span><b>${d.discord}</b> (${d.role})</span><button class="del-btn" onclick="deleteData('${collection}','${doc.id}')">Delete</button>` :
-                    `<span><b>${d.user}</b> - ${d.qty}x ${d.rank}</span><button class="del-btn" onclick="deleteData('${collection}','${doc.id}')">Delete</button>`;
-                container.appendChild(div);
+                const row = document.createElement('div');
+                row.className = 'book-row reveal';
+                row.innerHTML = `
+                    <div class="book-text"><h2>The Legend</h2><p>${d.text}</p></div>
+                    <img src="${d.img}" class="book-img">
+                `;
+                container.appendChild(row);
             });
         }
 
-        async function deleteData(col, id) {
-            if(confirm("Are you sure?")) {
-                await db.collection(col).doc(id).delete();
-                loadAdminData(col);
-            }
+        async function addPage() {
+            const img = document.getElementById('page-img').value;
+            const text = document.getElementById('page-text').value;
+            await db.collection('photobook').add({ img, text });
+            alert("Page Added!");
+            loadPhotobook();
+        }
+
+        // --- CASTING LOGIC ---
+        async function submitAudition() {
+            const data = {
+                name: document.getElementById('aud-name').value,
+                discord: document.getElementById('aud-discord').value,
+                rehearsals: document.getElementById('aud-rehearsals').value,
+                exp: document.getElementById('aud-exp').value,
+                ts: Date.now()
+            };
+            await db.collection('auditions').add(data);
+            alert("Application Sent!");
+            showPage('home');
+        }
+
+        // --- ADMIN MISC ---
+        function switchAdmin(id) {
+            document.getElementById('admin-shows').style.display = id === 'shows' ? 'block' : 'none';
+            document.getElementById('admin-book-edit').style.display = id === 'book-edit' ? 'block' : 'none';
+            document.getElementById('admin-auditions').style.display = id === 'view-auditions' ? 'block' : 'none';
+            if(id === 'view-auditions') loadAuditions();
+        }
+
+        async function loadAuditions() {
+            const container = document.getElementById('audition-data-list');
+            const snap = await db.collection('auditions').get();
+            container.innerHTML = "";
+            snap.forEach(doc => {
+                const d = doc.data();
+                container.innerHTML += `<div style="padding:10px; border-bottom:1px solid #444;">
+                    <b>${d.name}</b> (Discord: ${d.discord})<br>
+                    Availability: ${d.rehearsals}
+                </div>`;
+            });
         }
 
         function adminLogin() {
-            if(prompt("Staff Code:") === "Virtual2025!") {
-                localStorage.setItem('moulin_admin', 'true');
+            if(prompt("Enter Management Code:") === "Virtual2025!") {
+                localStorage.setItem('moulin_staff', 'true');
                 document.getElementById('admin-link').style.display = 'inline-block';
                 showPage('admin');
-                loadSettings();
             }
         }
+        if(localStorage.getItem('moulin_staff')) document.getElementById('admin-link').style.display = 'inline-block';
 
-        function logout() { localStorage.removeItem('moulin_admin'); location.reload(); }
-        if(localStorage.getItem('moulin_admin')) document.getElementById('admin-link').style.display = 'inline-block';
-        loadSettings();
     </script>
 </body>
 </html>
