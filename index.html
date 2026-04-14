@@ -3,255 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moulin Rouge! | The Spectacular Musical</title>
+    <title>Moulin Rouge! | Coming Soon</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Playfair+Display:ital,wght@1,700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root { 
             --rouge: #4a0404; --bright-red: #bc0000; --gold: #d4af37; --gold-light: #f9e29b; --black: #050505; 
         }
 
-        body { 
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--black);
-            background-image: radial-gradient(circle at center, var(--rouge) 0%, var(--black) 100%); 
-            color: white; font-family: 'Montserrat', sans-serif; margin: 0; min-height: 100vh; transition: opacity 0.5s;
+            background-image: radial-gradient(circle at center, var(--rouge) 0%, var(--black) 100%);
+            color: white; font-family: 'Montserrat', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; text-align: center;
         }
 
-        /* Navigatie */
-        nav { 
-            display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; 
-            background: rgba(0,0,0,0.95); border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000;
-        }
-        .logo { font-family: 'Cinzel Decorative'; color: var(--gold); font-size: 1.6rem; letter-spacing: 2px; text-shadow: 0 0 10px rgba(188,0,0,0.7); }
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
-        .nav-links a:hover { color: var(--gold); text-shadow: 0 0 8px var(--gold); }
-
-        section { padding: 60px 10%; display: none; }
-        .active { display: block; animation: fadeIn 0.8s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .glow-title { 
-            font-family: 'Cinzel Decorative'; color: var(--gold-light); 
-            text-shadow: 0 0 15px var(--bright-red); text-align: center; 
-            font-size: 3rem; text-transform: uppercase; margin-bottom: 40px;
+        .curtain-container {
+            position: relative; width: 90%; max-width: 800px; padding: 40px;
+            border: 3px solid var(--gold); background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 50px rgba(188,0,0,0.5), inset 0 0 30px rgba(0,0,0,1);
+            border-radius: 5px; animation: glow 3s infinite alternate;
         }
 
-        /* Home Post Layout (gebaseerd op afbeeldingen) */
-        .post-container { display: flex; flex-direction: column; gap: 50px; max-width: 1200px; margin: 0 auto; }
-        .post-card { display: flex; gap: 40px; align-items: center; background: rgba(0,0,0,0.4); padding: 20px; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 4px; }
-        .post-card:nth-child(even) { flex-direction: row-reverse; }
-        .post-img { width: 500px; height: 300px; border: 2px solid var(--bright-red); border-radius: 2px; overflow: hidden; box-shadow: 0 0 20px rgba(188,0,0,0.3); }
-        .post-img img { width: 100%; height: 100%; object-fit: cover; }
-        .post-content { flex: 1; text-align: left; }
-        .post-content h2 { font-family: 'Cinzel Decorative'; color: var(--gold); margin-top: 0; font-size: 2rem; }
-        .post-content p { line-height: 1.6; color: #eee; font-size: 1.1rem; }
+        @keyframes glow {
+            from { box-shadow: 0 0 30px rgba(188,0,0,0.3); }
+            to { box-shadow: 0 0 60px rgba(188,0,0,0.7), 0 0 20px var(--gold); }
+        }
 
-        /* Agenda & Tickets */
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 30px; }
-        .day { background: rgba(0,0,0,0.6); border: 1px solid #333; min-height: 100px; padding: 10px; cursor: pointer; text-align: center; }
-        .has-show { border: 2px solid var(--bright-red); background: rgba(188,0,0,0.1); }
+        .logo {
+            font-family: 'Cinzel Decorative'; color: var(--gold);
+            font-size: 3rem; margin-bottom: 20px; letter-spacing: 5px;
+            text-shadow: 2px 2px 0px #000, 0 0 15px var(--bright-red);
+        }
 
-        /* Forms */
-        .admin-box { background: rgba(15,15,15,0.9); border: 1px solid var(--gold); padding: 30px; border-radius: 8px; max-width: 600px; margin: 0 auto; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid var(--gold); color: white; border-radius: 4px; }
-        .btn { background: var(--bright-red); color: white; border: none; padding: 15px; cursor: pointer; font-weight: bold; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .message-container { margin-bottom: 40px; border-bottom: 1px solid var(--gold); padding-bottom: 20px; }
 
-        #ticket-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; }
-        .window { background: var(--rouge); border: 2px solid var(--gold); padding: 40px; border-radius: 10px; width: 450px; text-align: center; }
+        .lang-block { margin-bottom: 15px; opacity: 0; animation: fadeInUp 1s forwards; }
+        .lang-block:nth-child(1) { animation-delay: 0.2s; }
+        .lang-block:nth-child(2) { animation-delay: 0.5s; }
+        .lang-block:nth-child(3) { animation-delay: 0.8s; }
+
+        .closed-text { font-size: 1.4rem; font-weight: bold; text-transform: uppercase; color: #fff; margin: 5px 0; }
+
+        .spectacular-news {
+            font-family: 'Playfair Display'; font-style: italic; color: var(--gold-light);
+            font-size: 1.8rem; margin-top: 30px; line-height: 1.4;
+            animation: pulse 2s infinite;
+        }
+
+        .paris-tag {
+            display: inline-block; margin-top: 20px; padding: 10px 25px;
+            border: 1px solid var(--gold); font-family: 'Cinzel Decorative';
+            letter-spacing: 3px; color: var(--gold); font-size: 0.9rem;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 10px var(--bright-red); }
+            50% { transform: scale(1.02); text-shadow: 0 0 25px var(--bright-red); }
+        }
+
+        /* Windmill Decor */
+        .windmill {
+            position: absolute; bottom: -50px; right: -50px; width: 200px; opacity: 0.1;
+            pointer-events: none; transform: rotate(-15deg);
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <div class="logo">MOULIN ROUGE!</div>
-    <div class="nav-links">
-        <a onclick="showPage('home')" id="n-home">Home</a>
-        <a onclick="showPage('casting')" id="n-cast">Auditie</a>
-        <a onclick="showPage('tickets')" id="n-tickets">Tickets</a>
-        <a onclick="showPage('wallet')" id="n-wallet">Mijn Tickets (<span id="t-count">0</span>)</a>
-        <a onclick="adminLogin()" id="n-club">Club</a>
-        <div onclick="toggleLang()" id="lang-btn" style="color:var(--gold); font-weight:bold; cursor:pointer; padding:5px 10px; border:1px solid var(--gold);">NL</div>
-    </div>
-</nav>
-
-<section id="home" class="active">
-    <h1 class="glow-title" id="h-welcome">THE SPECTACULAR SPECTACULAR</h1>
-    <div id="home-posts" class="post-container">
-        </div>
-</section>
-
-<section id="casting">
-    <h1 class="glow-title">CASTING CALL</h1>
-    <div class="admin-box">
-        <input type="text" id="c-disc" placeholder="Discord Naam">
-        <input type="text" id="c-rob" placeholder="Roblox Naam">
+    <div class="curtain-container">
+        <div class="logo">MOULIN ROUGE!</div>
         
-        <label style="color:var(--gold); font-size: 0.8rem;">KIES JE ROL:</label>
-        <select id="c-role">
-            <option value="Christian">Christian</option>
-            <option value="Satine">Satine</option>
-            <option value="Harold Zidler">Harold Zidler</option>
-            <option value="The Duke of Monroth">The Duke of Monroth</option>
-            <option value="Toulouse-Lautrec">Toulouse-Lautrec</option>
-            <option value="Santiago">Santiago</option>
-            <option value="Nini">Nini</option>
-            <option value="La Chocolat">La Chocolat</option>
-            <option value="Arabia">Arabia</option>
-            <option value="Baby Doll">Baby Doll</option>
-            <option value="Ensemble / Dancer">Ensemble / Danser</option>
-        </select>
-        
-        <textarea id="c-exp" placeholder="Vertel ons over je theaterervaring..."></textarea>
-        <button class="btn" onclick="submitAudition()">VERSTUUR AUDITIE</button>
-    </div>
-</section>
-
-<section id="tickets">
-    <h1 class="glow-title" id="h-schedule">SPEELSCHEMA 2026</h1>
-    <div class="calendar" id="calendar-grid"></div>
-</section>
-
-<section id="dashboard">
-    <h1 class="glow-title">ADMIN PANEEL</h1>
-    <div class="admin-box" style="margin-bottom: 20px;">
-        <h3>Nieuw Bericht Maken</h3>
-        <input type="text" id="p-title" placeholder="Titel (bijv. AB HERBST IN HAMBURG)">
-        <input type="text" id="p-img" placeholder="Afbeelding URL (bijv. https://afbeelding.jpg)">
-        <textarea id="p-desc" placeholder="Beschrijving..."></textarea>
-        <button class="btn" style="background:var(--gold); color:black;" onclick="addPost()">POST BERICHT</button>
-    </div>
-    
-    <div class="admin-box">
-        <h3>Beheer</h3>
-        <input type="number" id="d-day" placeholder="Dag van April (1-30)">
-        <button class="btn" onclick="addShow()">SHOW ACTIVEREN</button>
-        <div id="admin-list" style="margin-top:20px;"></div>
-    </div>
-</section>
-
-<div id="ticket-overlay">
-    <div class="window">
-        <h2 id="sel-date" style="font-family:'Cinzel Decorative'; color:var(--gold);">DATUM</h2>
-        <div id="tier-options"></div>
-        <button class="btn" style="background:#333; margin-top:20px;" onclick="closeTickets()">SLUITEN</button>
-    </div>
-</div>
-
-<script>
-    let shows = {}; let posts = []; let auditions = []; let myTickets = []; let lang = 'NL'; let isAdmin = false;
-
-    function showPage(id) {
-        document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    function adminLogin() {
-        if(prompt("Wachtwoord:") === "Virtual2025!") {
-            isAdmin = true; showPage('dashboard'); renderAdmin();
-        }
-    }
-
-    // HOME POSTS MET FOTO'S
-    function addPost() {
-        const title = document.getElementById('p-title').value;
-        const img = document.getElementById('p-img').value;
-        const desc = document.getElementById('p-desc').value;
-        
-        if(!title || !img) return alert("Titel en Foto URL zijn verplicht!");
-        
-        posts.push({ id: Date.now(), title, img, desc });
-        renderHome();
-        alert("Bericht gepost!");
-    }
-
-    function renderHome() {
-        const container = document.getElementById('home-posts');
-        container.innerHTML = posts.map(p => `
-            <div class="post-card">
-                <div class="post-img"><img src="${p.img}" alt="post"></div>
-                <div class="post-content">
-                    <h2>${p.title}</h2>
-                    <p>${p.desc}</p>
-                    ${isAdmin ? `<button onclick="deletePost(${p.id})" style="color:red; background:none; border:none; cursor:pointer;">[Verwijderen]</button>` : ''}
-                </div>
+        <div class="message-container">
+            <div class="lang-block">
+                <p class="closed-text">De website is tijdelijk gesloten</p>
             </div>
-        `).join('');
-    }
+            <div class="lang-block">
+                <p class="closed-text">The website is temporarily closed</p>
+            </div>
+            <div class="lang-block">
+                <p class="closed-text">Die Website ist vorübergehend geschlossen</p>
+            </div>
+        </div>
 
-    function deletePost(id) {
-        posts = posts.filter(p => p.id !== id);
-        renderHome();
-    }
+        <div class="spectacular-news">
+            Er komt iets spectaculairs aan... rechtstreeks vanuit de Moulin Rouge in Parijs!
+            <br>
+            <small style="font-size: 0.6em; letter-spacing: 2px;">PREPARE FOR THE EXTRAVAGANZA</small>
+        </div>
 
-    // AUDITIES MET ROLKEUZE
-    function submitAudition() {
-        const data = {
-            id: Date.now(),
-            rob: document.getElementById('c-rob').value,
-            role: document.getElementById('c-role').value
+        <div class="paris-tag">DIRECTLY FROM PARIS</div>
+    </div>
+
+    <script>
+        // Een subtiele gouden confetti regen bij het laden
+        window.onload = () => {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#d4af37', '#bc0000']
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#d4af37', '#bc0000']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
         };
-        auditions.push(data);
-        alert("Je auditie voor de rol van " + data.role + " is ontvangen!");
-        renderAdmin();
-    }
-
-    // TICKETS
-    function addShow() {
-        const d = document.getElementById('d-day').value;
-        if(!d) return;
-        shows[d] = { sold: { cancan:0, rang1:0, diamond:0, bohemian:0 } };
-        renderCalendar(); renderAdmin();
-    }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendar-grid'); grid.innerHTML = '';
-        for(let i=1; i<=30; i++) {
-            const hasShow = shows[i];
-            grid.innerHTML += `<div class="day ${hasShow?'has-show':''}" onclick="openTickets(${i})">
-                <strong>${i}</strong>${hasShow?'<br><small style="color:red">SHOW</small>':''}
-            </div>`;
-        }
-    }
-
-    function openTickets(d) {
-        if(!shows[d]) return;
-        document.getElementById('sel-date').innerText = `APRIL ${d}, 2026`;
-        let html = `<div class="tier" style="margin-bottom:10px;">Kies je rang voor deze show:</div>`;
-        ['Can-Can', 'Rang 1', 'Diamond', 'Bohemian'].forEach(t => {
-            html += `<button class="btn" style="margin-bottom:10px; font-size:0.8rem;" onclick="buy(${d}, '${t}')">SELECTEER ${t}</button>`;
-        });
-        document.getElementById('tier-options').innerHTML = html;
-        document.getElementById('ticket-overlay').style.display = 'flex';
-    }
-
-    function buy(d, t) {
-        if(myTickets.length >= 5) return alert("Max 5 tickets!");
-        myTickets.push({ d, t, id: "MR-" + Math.random().toString(36).substr(2,6).toUpperCase() });
-        document.getElementById('t-count').innerText = myTickets.length;
-        closeTickets();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    }
-
-    function closeTickets() { document.getElementById('ticket-overlay').style.display = 'none'; }
-
-    function renderAdmin() {
-        if(!isAdmin) return;
-        let html = '<h4>Actieve Shows</h4>';
-        Object.keys(shows).forEach(d => html += `<div>Dag ${d} <button onclick="deleteShow(${d})">X</button></div>`);
-        html += '<h4 style="margin-top:20px;">Audities</h4>';
-        auditions.forEach(a => html += `<div>${a.rob} - Rol: ${a.role}</div>`);
-        document.getElementById('admin-list').innerHTML = html;
-    }
-
-    function deleteShow(d) { delete shows[d]; renderCalendar(); renderAdmin(); }
-
-    function toggleLang() {
-        const l = ['NL','EN','DE']; lang = l[(l.indexOf(lang)+1)%3];
-        document.getElementById('lang-btn').innerText = lang;
-        confetti({ particleCount: 50 });
-    }
-
-    renderCalendar();
-</script>
+    </script>
 </body>
 </html>
