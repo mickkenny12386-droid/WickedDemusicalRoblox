@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moulin Rouge! | Virtual Management System</title>
+    <title>Moulin Rouge! | The Spectacular Musical</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -14,7 +14,7 @@
             --rouge: #8b0000; 
             --gold: #d4af37; 
             --dark-red: #2a0000;
-            --card-bg: rgba(30, 0, 0, 0.95);
+            --card-bg: rgba(40, 0, 0, 0.95);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,16 +24,10 @@
             color: white; 
             font-family: 'Montserrat', sans-serif; 
             overflow-x: hidden;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.8s ease-in-out;
         }
 
-        /* --- Background Aesthetic --- */
-        .bg-pattern {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(circle, #4a0000 0%, #1a0000 100%);
-            z-index: -1;
-        }
-
+        /* Nav & Headers */
         nav { 
             background: rgba(0,0,0,0.95); 
             padding: 15px 50px; 
@@ -43,136 +37,123 @@
         }
         .logo-img { height: 60px; filter: drop-shadow(0 0 10px var(--gold)); cursor: pointer; }
 
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; }
-
-        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
-
-        /* --- Ready to Rouge Styling --- */
         .rouge-header { 
             font-family: 'Cinzel Decorative', cursive; 
-            font-size: 60px; 
+            font-size: clamp(30px, 8vw, 60px); 
             color: var(--gold); 
             text-align: center; 
-            margin-bottom: 20px;
+            margin: 40px 0 20px;
             text-shadow: 0 0 20px var(--rouge);
         }
 
-        /* --- Language Switcher --- */
-        .lang-picker {
-            position: fixed; bottom: 20px; right: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px; border: 1px solid var(--gold);
-            border-radius: 5px; z-index: 2000;
-        }
-        .lang-picker select { background: transparent; color: var(--gold); border: none; font-weight: bold; cursor: pointer; }
+        /* Calendar */
+        .calendar-title { font-family: 'Cinzel Decorative'; color: var(--gold); text-align: center; font-size: 32px; margin: 30px 0; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; max-width: 1000px; margin: auto; }
+        .cal-day { min-height: 100px; background: rgba(0,0,0,0.4); border: 1px solid #4a0000; padding: 10px; position: relative; }
+        .cal-num { font-size: 14px; opacity: 0.5; }
+        .show-info { background: var(--rouge); font-size: 10px; padding: 4px; margin-top: 5px; border-radius: 2px; }
 
-        /* --- Calendar & Dashboard UI --- */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 20px; }
-        .cal-cell { min-height: 100px; background: rgba(0,0,0,0.5); border: 1px solid #440000; padding: 5px; }
-        
-        .admin-panel { background: #111; border: 2px solid var(--gold); padding: 30px; border-radius: 10px; }
-        .btn-rouge { background: var(--rouge); color: white; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        
-        .section { display: none; }
-        .section.active { display: block; }
-
-        /* --- Photobook Alternating --- */
-        .book-row { display: flex; align-items: center; gap: 40px; margin-bottom: 40px; }
+        /* Photo Book */
+        .book-row { display: flex; align-items: center; gap: 40px; margin-bottom: 60px; }
         .book-row:nth-child(even) { flex-direction: row-reverse; }
-        .book-img { width: 50%; border: 4px solid var(--gold); box-shadow: 0 0 20px black; }
+        .book-img { width: 50%; border: 4px solid var(--gold); box-shadow: 0 15px 30px black; }
+        .book-text { width: 50%; font-size: 18px; line-height: 1.6; }
 
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; }
+        /* Dashboard UI */
+        .admin-section { background: #111; padding: 30px; border: 2px solid var(--gold); border-radius: 10px; margin-top: 30px; }
+        .data-list-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #333; align-items: center; }
+        .del-btn { background: var(--rouge); color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; }
+
+        /* Language Picker */
+        .lang-picker { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.9); padding: 15px; border: 1px solid var(--gold); border-radius: 5px; z-index: 2000; }
+        .lang-picker select { background: transparent; color: var(--gold); border: none; font-weight: bold; font-size: 16px; cursor: pointer; outline: none; }
+
+        .section { display: none; padding: 40px 20px; }
+        .section.active { display: block; }
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; text-transform: uppercase; border-radius: 3px; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #222; border: 1px solid #444; color: white; }
     </style>
 </head>
 <body>
-
-    <div class="bg-pattern"></div>
 
     <nav>
         <img src="https://i.ibb.co/L6H7Qvj/moulin-rouge-windmill.png" class="logo-img" onclick="showPage('home')">
         <div class="nav-links">
             <a onclick="showPage('home')" data-key="nav-home">Home</a>
             <a onclick="showPage('schedule')" data-key="nav-schedule">Schedule</a>
-            <a onclick="showPage('photobook')" data-key="nav-story">Story</a>
-            <a onclick="showPage('casting')" data-key="nav-casting">Casting</a>
-            <a id="admin-link" style="display:none; color: var(--gold);" onclick="showPage('admin')">Dashboard</a>
-            <a onclick="adminLogin()" style="color: var(--rouge);">Staff</a>
+            <a onclick="showPage('photobook')" data-key="nav-story">Photo Book</a>
+            <a id="admin-link" style="display:none; color: var(--gold);" onclick="showPage('admin')">Management</a>
+            <a onclick="adminLogin()" style="color: var(--rouge);">Staff Login</a>
         </div>
     </nav>
 
     <div class="container">
-        
         <div id="home" class="section active">
             <h1 class="rouge-header">GET READY TO ROUGE!</h1>
-            <div style="background: var(--card-bg); padding: 40px; border: 1px solid var(--gold); border-radius: 10px; text-align: center;">
-                <p id="home-desc" style="font-size: 18px; line-height: 1.8; color: #f0f0f0;">
-                    Prepare for a world of beauty and romance, of excitement, drama and excess! An extravagant world where all bohemians allow themselves to be seduced. Welcome to Moulin Rouge! The Musical...
+            <div style="max-width: 900px; margin: auto; text-align: center; line-height: 1.8; font-size: 19px;">
+                <p id="main-desc">
+                    Bereid je voor op een wereld vol schoonheid en romantiek, van opwinding, drama en overdaad! Een extravagante wereld waar alle bohemians zich laten verleiden. 
+                    Welkom bij Moulin Rouge! De Musical. De revolutionaire film van Baz Luhrmann komt tot leven in een unieke mash-up musical, met meer dan 70 bekende nummers. 
+                    Winnaar van maar liefst 10 Tony Awards® en een eerbetoon aan waarheid, schoonheid, vrijheid en natuurlijk liefde. 
+                    Moulin Rouge! De Musical is dan ook veel meer dan een musical; het is een state of mind! 
+                    Beleef de meest uitbundige nacht van je leven in het Beatrix Theater Utrecht.
                 </p>
-                <div style="background: var(--rouge); color: white; display: inline-block; padding: 5px 15px; margin-top: 20px; font-weight: bold;" data-key="lang-note">
-                    NOTE: ALL SONGS ARE PERFORMED IN ENGLISH
+                <div style="margin-top: 30px; border: 1px solid var(--gold); padding: 20px;">
+                    <h3 data-key="tickets-title">TICKETS & OFFERS</h3>
+                    <p data-key="tickets-sub">Book your experience below</p>
+                    <div id="deal-container" style="display: flex; gap: 20px; justify-content: center; margin-top: 20px;"></div>
                 </div>
             </div>
         </div>
 
         <div id="schedule" class="section">
-            <h2 style="text-align:center; font-family:'Cinzel Decorative'; color:var(--gold);" data-key="cal-title">OCTOBER 2026</h2>
+            <h1 class="calendar-title" id="cal-month-name">MONTH 2026</h1>
             <div class="calendar-grid" id="calendar-body"></div>
         </div>
 
         <div id="photobook" class="section">
-            <div id="book-content"></div>
-        </div>
-
-        <div id="casting" class="section">
-            <div style="max-width: 600px; margin: auto; background: var(--card-bg); padding: 40px; border: 1px solid var(--gold);">
-                <h2 style="color:var(--gold); margin-bottom:20px;" data-key="cast-title">Audition</h2>
-                <input type="text" id="aud-name" placeholder="Name">
-                <input type="text" id="aud-discord" placeholder="Discord">
-                <p data-key="rehearsal-q">Can you attend all rehearsals?</p>
-                <select id="aud-rehearsals">
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-                <textarea id="aud-exp" placeholder="Experience"></textarea>
-                <button class="btn-rouge" onclick="submitAudition()">Submit</button>
-            </div>
+            <div id="book-content" style="max-width: 1000px; margin: auto;"></div>
         </div>
 
         <div id="admin" class="section">
-            <div class="admin-panel">
-                <h2 style="color:var(--gold); border-bottom:1px solid var(--gold); padding-bottom:10px;">Manager Suite</h2>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+            <div class="admin-section">
+                <h2>Show & Ticket Management</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        <h3>Plan Show / Deal</h3>
-                        <input type="date" id="new-show-date">
-                        <input type="text" id="new-show-title" placeholder="Title (e.g. Opening Night / Deal Name)">
-                        <input type="text" id="new-show-price" placeholder="Ticket Price (e.g. 79,99)">
-                        <textarea id="new-show-desc" placeholder="Show/Deal Description"></textarea>
-                        <button class="btn-rouge" onclick="addShow()">Add to System</button>
+                        <h3>Add Show/Deal</h3>
+                        <input type="date" id="adm-date">
+                        <input type="text" id="adm-title" placeholder="Show/Deal Title">
+                        <input type="text" id="adm-price" placeholder="Price (e.g. €79.99)">
+                        <button class="btn-gold" onclick="saveData('shows')">Save Event</button>
                     </div>
+                    <div id="adm-show-list"></div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h2>Photo Book Editor</h2>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
-                        <h3>Manage Photobook</h3>
-                        <input type="text" id="page-img" placeholder="Image URL">
-                        <textarea id="page-text" placeholder="Description"></textarea>
-                        <button class="btn-rouge" onclick="addPage()">Add Page</button>
+                        <input type="text" id="adm-img-url" placeholder="Image URL">
+                        <textarea id="adm-img-desc" placeholder="Image Description"></textarea>
+                        <button class="btn-gold" onclick="saveData('book')">Add to Book</button>
                     </div>
+                    <div id="adm-book-list"></div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="lang-picker">
-        <select onchange="changeLanguage(this.value)">
-            <option value="en">English</option>
+        <select onchange="applyLanguage(this.value)">
             <option value="nl">Nederlands</option>
+            <option value="en">English</option>
             <option value="de">Deutsch</option>
         </select>
     </div>
 
     <script>
-        // Firebase Configuration (Using provided IDs)
+        // Use your existing Firebase config from prior prompts
         const firebaseConfig = {
             apiKey: "AIzaSyCCm6vZCE1KH1SnclU7NHF2BmeOUW_suio",
             authDomain: "wickedrobloxofficial.firebaseapp.com",
@@ -184,110 +165,117 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const translations = {
-            en: {
-                "nav-home": "Home", "nav-schedule": "Schedule", "nav-story": "Story", "nav-casting": "Casting",
-                "lang-note": "NOTE: ALL SONGS ARE PERFORMED IN ENGLISH",
-                "home-desc": "Prepare for a world of beauty and romance, of excitement, drama and excess! An extravagant world where all bohemians allow themselves to be seduced. Welcome to Moulin Rouge! The Musical. Baz Luhrmann's revolutionary film comes to life in a unique mash-up musical, with more than 70 well-known songs. Winner of no less than 10 Tony Awards® and a tribute to truth, beauty, freedom and of course love. Moulin Rouge! The Musical is much more than a musical; it is a state of mind! Experience the most exuberant night of your life in the Beatrix Theater Utrecht."
+        const langData = {
+            nl: { 
+                "nav-home": "Home", "nav-schedule": "Schema", "nav-story": "Fotoboek",
+                "tickets-title": "TICKETS & AANBIEDINGEN", "tickets-sub": "Boek uw ervaring hieronder",
+                "main-desc": "Bereid je voor op een wereld vol schoonheid en romantiek... Welkom bij Moulin Rouge! De Musical."
             },
-            nl: {
-                "nav-home": "Home", "nav-schedule": "Schema", "nav-story": "Verhaal", "nav-casting": "Auditie",
-                "lang-note": "LET OP: ALLE LIEDJES WORDEN IN HET ENGELS GEZONGEN",
-                "home-desc": "Bereid je voor op een wereld vol schoonheid en romantiek, van opwinding, drama en overdaad! Een extravagante wereld waar alle bohemians zich laten verleiden. Welkom bij Moulin Rouge! De Musical. De revolutionaire film van Baz Luhrmann komt tot leven in een unieke mash-up musical, met meer dan 70 bekende nummers. Winnaar van maar liefst 10 Tony Awards® en een eerbetoon aan waarheid, schoonheid, vrijheid en natuurlijk liefde. Moulin Rouge! De Musical is dan ook veel meer dan een musical; het is een state of mind! Beleef de meest uitbundige nacht van je leven in het Beatrix Theater Utrecht."
+            en: { 
+                "nav-home": "Home", "nav-schedule": "Schedule", "nav-story": "Photo Book",
+                "tickets-title": "TICKETS & OFFERS", "tickets-sub": "Book your experience below",
+                "main-desc": "Prepare for a world of beauty and romance... Welcome to Moulin Rouge! The Musical."
             },
-            de: {
-                "nav-home": "Startseite", "nav-schedule": "Spielplan", "nav-story": "Geschichte", "nav-casting": "Casting",
-                "lang-note": "HINWEIS: ALLE LIEDER WERDEN AUF ENGLISCH GESUNGEN",
-                "home-desc": "Bereiten Sie sich auf eine Welt voller Schönheit und Romantik, Aufregung, Drama und Exzess vor! Eine extravagante Welt, in der sich alle Bohemiens verführen lassen. Willkommen bei Moulin Rouge! Das Musical. Baz Luhrmanns revolutionärer Film wird in einem einzigartigen Mash-up-Musical mit mehr als 70 bekannten Songs zum Leben erweckt. Gewinner von nicht weniger als 10 Tony Awards® und eine Hommage an Wahrheit, Schönheit, Freiheit und natürlich Liebe. Moulin Rouge! Das Musical ist viel mehr als ein Musical; es ist eine Lebenseinstellung! Erleben Sie die überschwänglichste Nacht Ihres Lebens im Beatrix Theater Utrecht."
+            de: { 
+                "nav-home": "Startseite", "nav-schedule": "Spielplan", "nav-story": "Fotobuch",
+                "tickets-title": "TICKETS & ANGEBOTE", "tickets-sub": "Buchen Sie hier Ihr Erlebnis",
+                "main-desc": "Bereiten Sie sich auf eine Welt voller Schönheit und Romantik vor... Willkommen bei Moulin Rouge! Das Musical."
             }
         };
 
-        function changeLanguage(lang) {
-            // Silver and Red Confetti
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: ['#8b0000', '#C0C0C0', '#ffffff', '#2a0000']
-            });
-
-            // Fade effect
+        function applyLanguage(lang) {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#8b0000', '#C0C0C0'] });
             document.body.style.opacity = '0';
             setTimeout(() => {
-                const dict = translations[lang];
-                document.querySelectorAll('[data-key]').forEach(el => {
-                    const key = el.getAttribute('data-key');
-                    if (dict[key]) el.innerText = dict[key];
-                });
-                document.getElementById('home-desc').innerText = dict["home-desc"];
+                const dict = langData[lang];
+                document.querySelectorAll('[data-key]').forEach(el => el.innerText = dict[el.dataset.key]);
+                document.getElementById('main-desc').innerText = dict["main-desc"];
                 document.body.style.opacity = '1';
-            }, 500);
+            }, 800);
         }
 
-        async function addShow() {
-            const date = document.getElementById('new-show-date').value;
-            const title = document.getElementById('new-show-title').value;
-            const price = document.getElementById('new-show-price').value;
-            const desc = document.getElementById('new-show-desc').value;
-            await db.collection('shows').add({ date, title, price, desc });
-            alert("Show/Deal Added!");
+        async function saveData(type) {
+            if(type === 'shows') {
+                const date = document.getElementById('adm-date').value;
+                const title = document.getElementById('adm-title').value;
+                const price = document.getElementById('adm-price').value;
+                await db.collection('shows').add({ date, title, price, ts: Date.now() });
+            } else {
+                const url = document.getElementById('adm-img-url').value;
+                const desc = document.getElementById('adm-img-desc').value;
+                await db.collection('photobook').add({ url, desc, ts: Date.now() });
+            }
+            alert("Updated successfully!");
+            location.reload();
         }
 
-        async function addPage() {
-            const img = document.getElementById('page-img').value;
-            const text = document.getElementById('page-text').value;
-            await db.collection('photobook').add({ img, text, ts: Date.now() });
-            alert("Page Added!");
-        }
-
-        async function renderCalendar() {
-            const container = document.getElementById('calendar-body');
-            container.innerHTML = "";
-            const showsSnap = await db.collection('shows').get();
-            const shows = {};
-            showsSnap.forEach(doc => shows[doc.data().date] = doc.data());
-
-            for(let i=1; i<=31; i++) {
-                const d = `2026-10-${i.toString().padStart(2, '0')}`;
-                const cell = document.createElement('div');
-                cell.className = 'cal-cell';
-                cell.innerHTML = `<b>${i}</b>`;
-                if(shows[d]) {
-                    cell.innerHTML += `<div style="background:var(--rouge); font-size:10px; padding:2px; margin-top:5px;">
-                        ${shows[d].title}<br><b>R$ ${shows[d].price}</b></div>`;
-                }
-                container.appendChild(cell);
+        async function deleteItem(col, id) {
+            if(confirm("Are you sure?")) {
+                await db.collection(col).doc(id).delete();
+                location.reload();
             }
         }
 
-        async function loadPhotobook() {
-            const container = document.getElementById('book-content');
-            container.innerHTML = "";
-            const snap = await db.collection('photobook').orderBy('ts', 'asc').get();
-            snap.forEach(doc => {
+        async function init() {
+            // Live Calendar Month
+            const now = new Date();
+            const monthNames = ["JANUARI", "FEBRUARI", "MAART", "APRIL", "MEI", "JUNI", "JULI", "AUGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DECEMBER"];
+            document.getElementById('cal-month-name').innerText = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+            
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const calBody = document.getElementById('calendar-body');
+            
+            // Load Events
+            const showsSnap = await db.collection('shows').get();
+            const shows = {};
+            showsSnap.forEach(doc => {
+                const data = doc.data();
+                shows[data.date] = data;
+                // Add to Home Deals
+                document.getElementById('deal-container').innerHTML += `<div style="background:var(--rouge); padding:15px; border:1px dotted var(--gold);"><b>${data.title}</b><br>${data.price}</div>`;
+                // Add to Admin List
+                document.getElementById('adm-show-list').innerHTML += `<div class="data-list-item"><span>${data.date} - ${data.title}</span><button class="del-btn" onclick="deleteItem('shows','${doc.id}')">X</button></div>`;
+            });
+
+            for(let i=1; i<=daysInMonth; i++) {
+                const dStr = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${i.toString().padStart(2,'0')}`;
+                const cell = document.createElement('div');
+                cell.className = 'cal-day';
+                cell.innerHTML = `<div class="cal-num">${i}</div>`;
+                if(shows[dStr]) cell.innerHTML += `<div class="show-info">${shows[dStr].title}<br><b>${shows[dStr].price}</b></div>`;
+                calBody.appendChild(cell);
+            }
+
+            // Load Photobook
+            const bookSnap = await db.collection('photobook').orderBy('ts', 'asc').get();
+            const bookContainer = document.getElementById('book-content');
+            bookSnap.forEach(doc => {
                 const d = doc.data();
-                const row = document.createElement('div');
-                row.className = 'book-row';
-                row.innerHTML = `<div style="flex:1;">${d.text}</div><img src="${d.img}" class="book-img">`;
-                container.appendChild(row);
+                bookContainer.innerHTML += `
+                    <div class="book-row">
+                        <img src="${d.url}" class="book-img">
+                        <div class="book-text">${d.desc}</div>
+                    </div>
+                `;
+                document.getElementById('adm-book-list').innerHTML += `<div class="data-list-item"><span>Photo Page</span><button class="del-btn" onclick="deleteItem('photobook','${doc.id}')">X</button></div>`;
             });
         }
 
         function showPage(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id === 'schedule') renderCalendar();
-            if(id === 'photobook') loadPhotobook();
         }
 
         function adminLogin() {
-            if(prompt("Staff Code:") === "Virtual2025!") {
+            if(prompt("Enter Access Code:") === "Virtual2025!") {
                 localStorage.setItem('moulin_staff', 'true');
                 document.getElementById('admin-link').style.display = 'inline-block';
                 showPage('admin');
             }
         }
         if(localStorage.getItem('moulin_staff')) document.getElementById('admin-link').style.display = 'inline-block';
+        
+        init();
     </script>
 </body>
 </html>
