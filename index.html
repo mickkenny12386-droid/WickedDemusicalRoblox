@@ -15,46 +15,69 @@
         body { 
             background: var(--black-deep); color: var(--white); font-family: 'Montserrat', sans-serif; 
             margin: 0; background-image: radial-gradient(circle at top, #1a150a 0%, #050505 100%);
+            min-height: 100vh;
         }
 
+        /* Nav */
         nav { 
             display: flex; justify-content: space-between; align-items: center; padding: 25px 8%; 
-            border-bottom: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.95);
             position: sticky; top: 0; z-index: 1000;
         }
         .logo { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.8rem; letter-spacing: 4px; }
-        .nav-links a { color: var(--white); text-decoration: none; margin-left: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .nav-links a { color: var(--white); text-decoration: none; margin-left: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
         .nav-links a:hover { color: var(--gold); }
 
-        section { padding: 60px 8%; display: none; min-height: 80vh; }
+        section { padding: 60px 8%; display: none; }
         .active { display: block; animation: pageIn 0.6s ease-out; }
-        @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .section-title { font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; color: var(--gold); letter-spacing: 5px; text-transform: uppercase; }
+        .section-title { font-family: 'Oswald', sans-serif; font-size: 2.5rem; text-align: center; color: var(--gold); letter-spacing: 5px; text-transform: uppercase; margin-bottom: 40px; }
 
-        /* Show Cards */
-        .show-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
-        .show-card { background: var(--black-soft); border: 1px solid rgba(212, 175, 55, 0.2); padding: 40px; text-align: center; transition: 0.4s; }
-        .show-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        /* UI Elements */
+        .luxury-box { background: var(--black-soft); border: 1px solid var(--gold); padding: 40px; max-width: 750px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        .show-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .show-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(212, 175, 55, 0.2); padding: 30px; text-align: center; transition: 0.4s; }
+        .show-card:hover { border-color: var(--gold); transform: translateY(-5px); background: rgba(212,175,55,0.05); }
 
-        /* Forms & Buttons */
-        .luxury-box { background: var(--black-soft); border: 1px solid var(--gold); padding: 50px; max-width: 700px; margin: 0 auto; }
-        input, select { width: 100%; padding: 15px; margin: 15px 0; background: #000; border: 1px solid #333; color: white; }
-        .btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 14px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; width: 100%; }
-        .btn:hover { background: var(--gold); color: black; }
-        .btn-red { color: #ff4444; border-color: #440000; font-size: 0.7rem; margin-top: 15px; width: auto; padding: 5px 10px; }
-        .btn-red:hover { background: #440000; color: white; }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; box-sizing: border-box; }
+        .btn { background: var(--gold); color: black; border: none; padding: 15px; cursor: pointer; font-weight: bold; width: 100%; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .btn:hover { background: white; box-shadow: 0 0 20px var(--gold); }
+        .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
 
-        /* Seating */
-        .stage { width: 60%; height: 8px; background: var(--gold); margin: 0 auto 50px auto; box-shadow: 0 0 20px var(--gold); border-radius: 50%; }
-        .seat-grid { display: grid; gap: 10px; justify-content: center; }
-        .seat { width: 32px; height: 32px; border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; color: #666; }
-        .seat:hover:not(.occupied):not(.blocked) { background: var(--gold); color: black; }
-        .seat.selected { background: var(--white); color: black; box-shadow: 0 0 15px white; }
-        .seat.occupied { background: #222; opacity: 0.3; cursor: not-allowed; }
-        .seat.blocked { background: #300; border-color: #600; cursor: not-allowed; }
+        /* Seating Chart V2 */
+        .seating-area { background: rgba(0,0,0,0.4); padding: 50px 20px; border-radius: 10px; border: 1px solid #222; position: relative; }
+        .stage-visual { 
+            width: 70%; height: 40px; background: linear-gradient(to bottom, var(--gold), #886b1c); 
+            margin: 0 auto 60px auto; border-radius: 0 0 100px 100px; 
+            display: flex; align-items: center; justify-content: center;
+            color: black; font-family: 'Oswald'; font-size: 0.8rem; letter-spacing: 5px;
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+        }
 
-        .u-shape { display: flex; gap: 40px; justify-content: center; }
+        .seat-grid { display: grid; gap: 8px; justify-content: center; perspective: 1000px; }
+        
+        .seat { 
+            width: 28px; height: 28px; border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 4px 4px 8px 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 0.6rem; 
+            cursor: pointer; transition: 0.3s; position: relative; background: #111;
+        }
+        .seat:hover:not(.occupied):not(.blocked) { background: var(--gold); transform: translateY(-3px) scale(1.1); color: black; }
+        .seat.selected { background: var(--white); color: black; box-shadow: 0 0 20px var(--white); border-color: white; }
+        .seat.occupied { background: #333; border-color: #444; color: #555; cursor: not-allowed; }
+        .seat.blocked { background: #400; border-color: #ff0000; color: #900; cursor: not-allowed; }
+
+        /* Theater Curved Rows */
+        .theater-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 5px; }
+        
+        /* Conference U-Shape Improved */
+        .u-layout { display: flex; gap: 60px; justify-content: center; align-items: flex-start; }
+        .u-side { display: grid; grid-template-columns: 1fr; gap: 6px; }
+        .u-back { display: grid; grid-template-columns: repeat(14, 1fr); gap: 6px; padding-top: 20px; }
+
+        .legend { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; font-size: 0.7rem; color: #888; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .l-box { width: 12px; height: 12px; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -68,49 +91,61 @@
 </nav>
 
 <section id="home" class="active">
-    <h1 class="section-title">Upcoming Shows</h1>
+    <h1 class="section-title">Ticket Shop</h1>
     <div id="show-list" class="show-grid"></div>
 </section>
 
 <section id="booking-login">
     <div class="luxury-box">
-        <h2 style="font-family:'Oswald'; color:var(--gold)">RESERVATION</h2>
-        <input type="text" id="user-discord" placeholder="Discord Username (e.g. User#1234)">
+        <h2 style="color:var(--gold); font-family:'Oswald';">USER DETAILS</h2>
+        <input type="text" id="user-discord" placeholder="Discord Username (e.g., Name#0000)">
         <input type="text" id="user-roblox" placeholder="Roblox Username">
-        <button class="btn" onclick="openSeating()">SELECT YOUR SEAT</button>
+        <button class="btn" onclick="openSeating()">CHOOSE YOUR SEAT</button>
     </div>
 </section>
 
 <section id="seating">
-    <h1 class="section-title" style="font-size:2rem;">Seat Selection</h1>
-    <div class="stage"></div>
-    <div id="chart-render"></div>
-    <div style="text-align:center; margin-top:30px;">
-        <p>Selected Seat: <span id="selected-seat-display" style="color:var(--gold); font-weight:bold;">None</span></p>
-        <button class="btn" style="max-width:300px;" onclick="confirmBooking()">CONFIRM BOOKING</button>
+    <h1 class="section-title" style="font-size:1.8rem;">Select Your Seat</h1>
+    
+    <div class="legend">
+        <div class="legend-item"><div class="l-box" style="border:1px solid var(--gold)"></div> Available</div>
+        <div class="legend-item"><div class="l-box" style="background:#333"></div> Occupied</div>
+        <div class="legend-item"><div class="l-box" style="background:#400"></div> Blocked</div>
+        <div class="legend-item"><div class="l-box" style="background:white"></div> Selected</div>
+    </div>
+
+    <div class="seating-area">
+        <div class="stage-visual">STAGE / SCREEN</div>
+        <div id="chart-render"></div>
+        
+        <div style="text-align:center; margin-top:40px;">
+            <p style="font-size:0.9rem;">Seat: <span id="selected-seat-display" style="color:var(--gold); font-weight:bold; font-size:1.2rem;">-</span></p>
+            <button class="btn" style="max-width:300px;" onclick="confirmBooking()">CONFIRM & BOOK</button>
+        </div>
     </div>
 </section>
 
 <section id="admin">
-    <h1 class="section-title">Management</h1>
-    <div class="luxury-box" style="margin-bottom:50px;">
-        <h3 style="color:var(--gold); font-family:'Oswald';">CREATE NEW SHOW</h3>
-        <input type="text" id="new-name" placeholder="Show Name">
+    <h1 class="section-title">Owner Dashboard</h1>
+    <div class="luxury-box">
+        <h3>Create New Show</h3>
+        <input type="text" id="new-name" placeholder="Show Title">
         <input type="date" id="new-date">
         <select id="new-venue" onchange="previewAdmin()">
-            <option value="theater">Theater (7 Rows of 12)</option>
-            <option value="conference">Conference Room (U-Shape)</option>
+            <option value="theater">Grand Theater (7 Rows x 12 Seats)</option>
+            <option value="conference">Conference Hall (U-Shape Setup)</option>
         </select>
-        <p style="font-size:0.7rem; color:var(--gold);">CLICK SEATS TO BLOCK THEM (RED):</p>
+        <p style="font-size:0.7rem; color:var(--gold); margin-top:20px;">CLICK TO BLOCK SEATS FOR STAFF/VIP:</p>
         <div id="admin-preview" style="transform:scale(0.8);"></div>
         <button class="btn" onclick="saveShow()">PUBLISH SHOW</button>
     </div>
-    <h2 style="text-align:center; color:var(--gold);">ACTIVE SHOWS</h2>
-    <div id="admin-show-list" class="show-grid"></div>
+    
+    <h2 class="section-title" style="font-size:1.5rem; margin-top:60px;">Manage Existing Shows</h2>
+    <div id="admin-manage-list" class="show-grid"></div>
 </section>
 
 <script>
-    let shows = JSON.parse(localStorage.getItem('ma_shows')) || [];
+    let shows = JSON.parse(localStorage.getItem('ma_shows_v2')) || [];
     let currentShow = null;
     let selectedSeat = null;
     let blockedSeats = [];
@@ -123,40 +158,40 @@
     }
 
     function authAdmin() {
-        if(prompt("Enter Owner Password:") === "firsteditionmusical") {
+        if(prompt("Owner Password:") === "firsteditionmusical") {
             showPage('admin'); renderAdminList(); previewAdmin();
-        } else alert("Access Denied.");
+        } else alert("Invalid Password");
     }
 
-    // --- LOGIC ---
+    // --- SEATING ENGINE ---
 
     function renderVenue(venue, container, isAdmin, showData = null) {
         container.innerHTML = '';
-        const grid = document.createElement('div');
-        grid.className = 'seat-grid';
-
         if(venue === 'theater') {
-            grid.style.gridTemplateColumns = 'repeat(12, 1fr)';
-            for(let i=1; i<=84; i++) {
-                const label = `Row ${Math.ceil(i/12)}-S${i%12 || 12}`;
-                createSeat(i, label, grid, isAdmin, showData);
+            for(let r=1; r<=7; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'theater-row';
+                for(let s=1; s<=12; s++) {
+                    const label = `Row ${r}-S${s}`;
+                    createSeat(label, s, rowDiv, isAdmin, showData);
+                }
+                container.appendChild(rowDiv);
             }
         } else {
-            const wrap = document.createElement('div'); wrap.className = 'u-shape';
-            const L = document.createElement('div'); L.style.display = 'grid';
-            const B = document.createElement('div'); B.style.display = 'grid'; B.style.gridTemplateColumns = 'repeat(14, 1fr)';
-            const R = document.createElement('div'); R.style.display = 'grid';
+            const uWrap = document.createElement('div'); uWrap.className = 'u-layout';
+            const L = document.createElement('div'); L.className = 'u-side';
+            const B = document.createElement('div'); B.className = 'u-back';
+            const R = document.createElement('div'); R.className = 'u-side';
             
-            for(let i=1; i<=12; i++) createSeat(i, `Left-${i}`, L, isAdmin, showData);
-            for(let i=13; i<=40; i++) createSeat(i, `Back-${i-12}`, B, isAdmin, showData);
-            for(let i=41; i<=52; i++) createSeat(i, `Right-${i-40}`, R, isAdmin, showData);
+            for(let i=1; i<=12; i++) createSeat(`Left-${i}`, i, L, isAdmin, showData);
+            for(let i=1; i<=28; i++) createSeat(`Back-${i}`, i, B, isAdmin, showData);
+            for(let i=1; i<=12; i++) createSeat(`Right-${i}`, i, R, isAdmin, showData);
             
-            wrap.append(L, B, R); grid.appendChild(wrap);
+            uWrap.append(L, B, R); container.appendChild(uWrap);
         }
-        container.appendChild(grid);
     }
 
-    function createSeat(num, label, container, isAdmin, data) {
+    function createSeat(label, num, container, isAdmin, data) {
         const s = document.createElement('div'); s.className = 'seat'; s.innerText = num;
         if(data) {
             if(data.blocked?.includes(label)) s.classList.add('blocked');
@@ -177,6 +212,8 @@
         container.appendChild(s);
     }
 
+    // --- LOGIC ---
+
     function previewAdmin() {
         blockedSeats = [];
         renderVenue(document.getElementById('new-venue').value, document.getElementById('admin-preview'), true);
@@ -187,35 +224,35 @@
         const date = document.getElementById('new-date').value;
         if(!name || !date) return alert("Fill all fields");
         shows.push({ id: Date.now(), name, date, venue: document.getElementById('new-venue').value, blocked: [...blockedSeats], occupied: [] });
-        updateData(); alert("Show Published!");
+        updateAll(); alert("Show Published!");
     }
 
     function deleteShow(id) {
         if(confirm("Delete this show?")) {
             shows = shows.filter(s => s.id !== id);
-            updateData();
+            updateAll();
         }
     }
 
-    function updateData() {
-        localStorage.setItem('ma_shows', JSON.stringify(shows));
+    function updateAll() {
+        localStorage.setItem('ma_shows_v2', JSON.stringify(shows));
         renderHome(); renderAdminList();
     }
 
     function renderHome() {
         document.getElementById('show-list').innerHTML = shows.map(s => `
             <div class="show-card">
-                <h3>${s.name}</h3>
-                <p>${s.date}</p>
-                <button class="btn" onclick="startBooking(${s.id})">BOOK TICKETS</button>
+                <h3 style="color:var(--gold); font-family:'Oswald'; margin:0;">${s.name}</h3>
+                <p style="font-size:0.8rem; opacity:0.6;">${s.date}</p>
+                <button class="btn btn-outline" onclick="startBooking(${s.id})">BOOK NOW</button>
             </div>`).join('');
     }
 
     function renderAdminList() {
-        document.getElementById('admin-show-list').innerHTML = shows.map(s => `
-            <div class="show-card">
-                <h4>${s.name}</h4>
-                <button class="btn btn-red" onclick="deleteShow(${s.id})">DELETE SHOW</button>
+        document.getElementById('admin-manage-list').innerHTML = shows.map(s => `
+            <div class="show-card" style="padding:15px;">
+                <h4 style="margin:0; font-size:0.9rem;">${s.name}</h4>
+                <button class="btn btn-outline" style="color:red; border-color:#400; margin-top:10px; font-size:0.6rem; padding:5px;" onclick="deleteShow(${s.id})">DELETE</button>
             </div>`).join('');
     }
 
@@ -225,32 +262,32 @@
     }
 
     function openSeating() {
-        if(!document.getElementById('user-discord').value) return alert("Enter Discord info");
+        if(!document.getElementById('user-discord').value) return alert("Please enter your Discord name.");
         showPage('seating');
         renderVenue(currentShow.venue, document.getElementById('chart-render'), false, currentShow);
     }
 
     function confirmBooking() {
-        if(!selectedSeat) return alert("Select a seat");
+        if(!selectedSeat) return alert("Please select a seat.");
         currentShow.occupied.push(selectedSeat);
         
         fetch(WEBHOOK, {
             method: 'POST', headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 embeds: [{
-                    title: "🎟️ NEW TICKET BOOKED", color: 13936439,
+                    title: "🎟️ NEW TICKET RESERVED", color: 13936439,
                     fields: [
                         {name: "Show", value: currentShow.name, inline: true},
                         {name: "Seat", value: selectedSeat, inline: true},
                         {name: "Discord", value: document.getElementById('user-discord').value},
                         {name: "Roblox", value: document.getElementById('user-roblox').value}
-                    ]
+                    ], footer: { text: "Musical Awards Automated System" }, timestamp: new Date()
                 }]
             })
         }).then(() => {
             confetti({ particleCount: 150, colors: ['#d4af37', '#ffffff'] });
-            alert("Booking Successful!");
-            updateData(); showPage('home');
+            alert("Reservation Complete! See you at the show.");
+            updateAll(); showPage('home');
         });
     }
 
