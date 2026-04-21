@@ -1,286 +1,260 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Musical Awards | Ticket Systeem</title>
+    <title>Musical Awards | Excellence in Theater</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Oswald:wght@300;500;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --gold-dark: #aa8a2e; --black: #0a0a0a; --grey: #222; --occupied: #444; }
+        :root { 
+            --gold: #d4af37; --gold-bright: #f9e29b; --black-deep: #050505; 
+            --black-soft: #121212; --white: #ffffff; --danger: #8b0000;
+        }
         
         body { 
-            background: var(--black); color: white; font-family: 'Montserrat', sans-serif; margin: 0; 
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            background: var(--black-deep); color: var(--white); font-family: 'Montserrat', sans-serif; 
+            margin: 0; background-image: radial-gradient(circle at top, #1a150a 0%, #050505 100%);
         }
 
-        /* Nav & Layout */
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; border-bottom: 2px solid var(--gold); background: rgba(0,0,0,0.9); }
-        .logo { font-family: 'Oswald'; color: var(--gold); font-size: 1.5rem; letter-spacing: 3px; text-transform: uppercase; }
-        
-        section { padding: 40px 5%; display: none; }
-        .active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        nav { 
+            display: flex; justify-content: space-between; align-items: center; padding: 25px 8%; 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.9);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .logo { font-family: 'Cinzel', serif; color: var(--gold); font-size: 1.8rem; letter-spacing: 4px; }
+        .nav-links a { color: var(--white); text-decoration: none; margin-left: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
 
-        /* Admin & Forms */
-        .admin-box { background: rgba(20,20,20,0.9); border: 1px solid var(--gold); padding: 30px; border-radius: 4px; max-width: 600px; margin: 0 auto; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid #444; color: white; box-sizing: border-box; }
-        input:focus { border-color: var(--gold); outline: none; }
-        .btn { background: var(--gold); color: black; border: none; padding: 15px; cursor: pointer; font-weight: bold; width: 100%; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
-        .btn:hover { background: white; box-shadow: 0 0 15px var(--gold); }
+        section { padding: 60px 8%; display: none; min-height: 80vh; }
+        .active { display: block; animation: pageIn 0.6s ease-out; }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Seating Chart */
-        .seating-container { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .stage { width: 300px; background: var(--gold); color: black; padding: 10px; text-align: center; font-weight: bold; margin-bottom: 30px; border-radius: 0 0 50px 50px; }
-        
-        .seat-grid { display: grid; gap: 8px; justify-content: center; }
-        .seat { width: 30px; height: 30px; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; cursor: pointer; transition: 0.2s; border-radius: 3px; }
-        .seat:hover { background: var(--gold); color: black; }
-        .seat.selected { background: white; color: black; border-color: white; transform: scale(1.1); }
-        .seat.occupied { background: var(--occupied); border-color: #555; color: #777; cursor: not-allowed; }
-        .seat.blocked { background: #300; border-color: red; cursor: not-allowed; }
+        .section-title { font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; color: var(--gold); letter-spacing: 5px; text-transform: uppercase; }
 
-        /* Conference Room Layout Specifiek */
-        .u-shape { display: flex; gap: 50px; align-items: flex-start; }
-        .side-row { display: grid; grid-template-columns: 1fr; gap: 5px; }
-        .back-row { display: grid; grid-template-columns: repeat(14, 1fr); gap: 5px; }
+        /* Show Cards */
+        .show-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .show-card { background: var(--black-soft); border: 1px solid rgba(212, 175, 55, 0.2); padding: 40px; text-align: center; transition: 0.4s; }
+        .show-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        /* Home Cards */
-        .show-card { border: 1px solid var(--gold); padding: 20px; text-align: center; margin-bottom: 20px; transition: 0.3s; }
-        .show-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(212,175,55,0.3); }
+        /* Forms & Buttons */
+        .luxury-box { background: var(--black-soft); border: 1px solid var(--gold); padding: 50px; max-width: 700px; margin: 0 auto; }
+        input, select { width: 100%; padding: 15px; margin: 15px 0; background: #000; border: 1px solid #333; color: white; }
+        .btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 14px; cursor: pointer; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; width: 100%; }
+        .btn:hover { background: var(--gold); color: black; }
+        .btn-red { color: #ff4444; border-color: #440000; font-size: 0.7rem; margin-top: 15px; width: auto; padding: 5px 10px; }
+        .btn-red:hover { background: #440000; color: white; }
 
-        .hidden { display: none; }
+        /* Seating */
+        .stage { width: 60%; height: 8px; background: var(--gold); margin: 0 auto 50px auto; box-shadow: 0 0 20px var(--gold); border-radius: 50%; }
+        .seat-grid { display: grid; gap: 10px; justify-content: center; }
+        .seat { width: 32px; height: 32px; border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; cursor: pointer; color: #666; }
+        .seat:hover:not(.occupied):not(.blocked) { background: var(--gold); color: black; }
+        .seat.selected { background: var(--white); color: black; box-shadow: 0 0 15px white; }
+        .seat.occupied { background: #222; opacity: 0.3; cursor: not-allowed; }
+        .seat.blocked { background: #300; border-color: #600; cursor: not-allowed; }
+
+        .u-shape { display: flex; gap: 40px; justify-content: center; }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="logo">Musical Awards</div>
-    <div>
-        <a onclick="showPage('home')" style="color:white; margin-right:20px; cursor:pointer;">Home</a>
-        <a onclick="authAdmin()" style="color:var(--gold); cursor:pointer;">Dashboard</a>
+    <div class="logo">MUSICAL AWARDS</div>
+    <div class="nav-links">
+        <a onclick="showPage('home')">HOME</a>
+        <a onclick="authAdmin()">OWNER PANEL</a>
     </div>
 </nav>
 
 <section id="home" class="active">
-    <h1 style="text-align:center; color:var(--gold); font-family:'Oswald';">ACTUELE SHOWS</h1>
+    <h1 class="section-title">Upcoming Shows</h1>
     <div id="show-list" class="show-grid"></div>
 </section>
 
 <section id="booking-login">
-    <div class="admin-box">
-        <h2 style="color:var(--gold)">VERIFIEER JEZELF</h2>
-        <input type="text" id="user-discord" placeholder="Discord Gebruikersnaam (incl. #0000)">
-        <input type="text" id="user-roblox" placeholder="Roblox Gebruikersnaam">
-        <button class="btn" onclick="startSeatSelection()">KIES JE STOEL</button>
+    <div class="luxury-box">
+        <h2 style="font-family:'Oswald'; color:var(--gold)">RESERVATION</h2>
+        <input type="text" id="user-discord" placeholder="Discord Username (e.g. User#1234)">
+        <input type="text" id="user-roblox" placeholder="Roblox Username">
+        <button class="btn" onclick="openSeating()">SELECT YOUR SEAT</button>
     </div>
 </section>
 
 <section id="seating">
-    <h2 style="text-align:center; color:var(--gold)" id="seating-title">KIES EEN STOEL</h2>
-    <div class="seating-container">
-        <div class="stage">PODIUM / SCHERM</div>
-        <div id="chart-render"></div>
-        <div id="selection-info" style="margin-top:20px; font-weight:bold;">Geselecteerde stoel: <span id="selected-seat-id">-</span></div>
-        <button class="btn" style="max-width:300px;" onclick="confirmBooking()">RESERVERING VOLTOOIEN</button>
+    <h1 class="section-title" style="font-size:2rem;">Seat Selection</h1>
+    <div class="stage"></div>
+    <div id="chart-render"></div>
+    <div style="text-align:center; margin-top:30px;">
+        <p>Selected Seat: <span id="selected-seat-display" style="color:var(--gold); font-weight:bold;">None</span></p>
+        <button class="btn" style="max-width:300px;" onclick="confirmBooking()">CONFIRM BOOKING</button>
     </div>
 </section>
 
 <section id="admin">
-    <div class="admin-box">
-        <h2 style="color:var(--gold)">SHOW TOEVOEGEN</h2>
-        <input type="text" id="show-name" placeholder="Naam van de Show">
-        <input type="date" id="show-date">
-        <select id="show-venue" onchange="previewAdminSeats()">
-            <option value="theater">Theater (7 rijen van 12)</option>
-            <option value="conference">Conference Room (U-Vorm)</option>
+    <h1 class="section-title">Management</h1>
+    <div class="luxury-box" style="margin-bottom:50px;">
+        <h3 style="color:var(--gold); font-family:'Oswald';">CREATE NEW SHOW</h3>
+        <input type="text" id="new-name" placeholder="Show Name">
+        <input type="date" id="new-date">
+        <select id="new-venue" onchange="previewAdmin()">
+            <option value="theater">Theater (7 Rows of 12)</option>
+            <option value="conference">Conference Room (U-Shape)</option>
         </select>
-        <p style="font-size:0.8rem; color:var(--gold);">Klik op stoelen om ze te BLOKKEREN (rood):</p>
-        <div id="admin-seat-preview" class="seating-container" style="transform: scale(0.8);"></div>
-        <button class="btn" onclick="saveShow()">SHOW PUBLICEREN</button>
+        <p style="font-size:0.7rem; color:var(--gold);">CLICK SEATS TO BLOCK THEM (RED):</p>
+        <div id="admin-preview" style="transform:scale(0.8);"></div>
+        <button class="btn" onclick="saveShow()">PUBLISH SHOW</button>
     </div>
+    <h2 style="text-align:center; color:var(--gold);">ACTIVE SHOWS</h2>
+    <div id="admin-show-list" class="show-grid"></div>
 </section>
 
 <script>
-    let shows = [];
+    let shows = JSON.parse(localStorage.getItem('ma_shows')) || [];
     let currentShow = null;
     let selectedSeat = null;
     let blockedSeats = [];
-    const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1495954546743316644/QkS7uzzhImZ9nSZuVzLe113MMQ9X9xqsvdePzpxSEiq66DxneFRINjvxOKfcnhwBLmvx"; // <--- VUL HIER JE URL IN
+    const WEBHOOK = "https://discord.com/api/webhooks/1495954546743316644/QkS7uzzhImZ9nSZuVzLe113MMQ9X9xqsvdePzpxSEiq66DxneFRINjvxOKfcnhwBLmvx";
 
     function showPage(id) {
         document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+        window.scrollTo(0,0);
     }
 
     function authAdmin() {
-        const pass = prompt("Wachtwoord voor paneel:");
-        if (pass === "firsteditionmusical") {
-            showPage('admin');
-            previewAdminSeats();
-        } else {
-            alert("Verkeerd wachtwoord!");
-        }
+        if(prompt("Enter Owner Password:") === "firsteditionmusical") {
+            showPage('admin'); renderAdminList(); previewAdmin();
+        } else alert("Access Denied.");
     }
 
-    function previewAdminSeats() {
-        const venue = document.getElementById('show-venue').value;
-        const container = document.getElementById('admin-seat-preview');
+    // --- LOGIC ---
+
+    function renderVenue(venue, container, isAdmin, showData = null) {
         container.innerHTML = '';
-        blockedSeats = [];
-        renderVenue(venue, container, true);
-    }
-
-    function renderVenue(venue, container, isAdmin) {
         const grid = document.createElement('div');
         grid.className = 'seat-grid';
 
-        if (venue === 'theater') {
+        if(venue === 'theater') {
             grid.style.gridTemplateColumns = 'repeat(12, 1fr)';
-            for (let i = 1; i <= 84; i++) {
-                const row = Math.ceil(i / 12);
-                createSeat(i, `Rij ${row} - S${i % 12 || 12}`, grid, isAdmin);
+            for(let i=1; i<=84; i++) {
+                const label = `Row ${Math.ceil(i/12)}-S${i%12 || 12}`;
+                createSeat(i, label, grid, isAdmin, showData);
             }
         } else {
-            // Conference Room U-Vorm
-            const uWrapper = document.createElement('div');
-            uWrapper.className = 'u-shape';
+            const wrap = document.createElement('div'); wrap.className = 'u-shape';
+            const L = document.createElement('div'); L.style.display = 'grid';
+            const B = document.createElement('div'); B.style.display = 'grid'; B.style.gridTemplateColumns = 'repeat(14, 1fr)';
+            const R = document.createElement('div'); R.style.display = 'grid';
             
-            const left = document.createElement('div'); left.className = 'side-row';
-            const back = document.createElement('div'); back.className = 'back-row';
-            const right = document.createElement('div'); right.className = 'side-row';
-
-            for(let i=1; i<=12; i++) createSeat(i, `Links-${i}`, left, isAdmin);
-            for(let i=13; i<=40; i++) createSeat(i, `Achter-${i-12}`, back, isAdmin);
-            for(let i=41; i<=52; i++) createSeat(i, `Rechts-${i-40}`, right, isAdmin);
-
-            uWrapper.append(left, back, right);
-            grid.appendChild(uWrapper);
+            for(let i=1; i<=12; i++) createSeat(i, `Left-${i}`, L, isAdmin, showData);
+            for(let i=13; i<=40; i++) createSeat(i, `Back-${i-12}`, B, isAdmin, showData);
+            for(let i=41; i<=52; i++) createSeat(i, `Right-${i-40}`, R, isAdmin, showData);
+            
+            wrap.append(L, B, R); grid.appendChild(wrap);
         }
         container.appendChild(grid);
     }
 
-    function createSeat(id, label, container, isAdmin) {
-        const seat = document.createElement('div');
-        seat.className = 'seat';
-        seat.innerText = id;
-        
-        // Controleer of stoel in de huidige show al bezet is
-        if (!isAdmin && currentShow && currentShow.occupied && currentShow.occupied.includes(label)) {
-            seat.classList.add('occupied');
+    function createSeat(num, label, container, isAdmin, data) {
+        const s = document.createElement('div'); s.className = 'seat'; s.innerText = num;
+        if(data) {
+            if(data.blocked?.includes(label)) s.classList.add('blocked');
+            if(data.occupied?.includes(label)) s.classList.add('occupied');
         }
-        if (currentShow && currentShow.blocked && currentShow.blocked.includes(label)) {
-            seat.classList.add('blocked');
-        }
-
-        seat.onclick = () => {
-            if (isAdmin) {
-                seat.classList.toggle('blocked');
-                if(seat.classList.contains('blocked')) blockedSeats.push(label);
-                else blockedSeats = blockedSeats.filter(s => s !== label);
+        s.onclick = () => {
+            if(isAdmin) {
+                s.classList.toggle('blocked');
+                if(s.classList.contains('blocked')) blockedSeats.push(label);
+                else blockedSeats = blockedSeats.filter(x => x !== label);
             } else {
-                if (seat.classList.contains('occupied') || seat.classList.contains('blocked')) return;
-                document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
-                seat.classList.add('selected');
-                selectedSeat = label;
-                document.getElementById('selected-seat-id').innerText = label;
+                if(s.classList.contains('occupied') || s.classList.contains('blocked')) return;
+                document.querySelectorAll('.seat').forEach(x => x.classList.remove('selected'));
+                s.classList.add('selected'); selectedSeat = label;
+                document.getElementById('selected-seat-display').innerText = label;
             }
         };
-        container.appendChild(seat);
+        container.appendChild(s);
+    }
+
+    function previewAdmin() {
+        blockedSeats = [];
+        renderVenue(document.getElementById('new-venue').value, document.getElementById('admin-preview'), true);
     }
 
     function saveShow() {
-        const show = {
-            id: Date.now(),
-            name: document.getElementById('show-name').value,
-            date: document.getElementById('show-date').value,
-            venue: document.getElementById('show-venue').value,
-            blocked: [...blockedSeats],
-            occupied: []
-        };
-        shows.push(show);
-        renderHome();
-        showPage('home');
-        alert("Show succesvol toegevoegd!");
+        const name = document.getElementById('new-name').value;
+        const date = document.getElementById('new-date').value;
+        if(!name || !date) return alert("Fill all fields");
+        shows.push({ id: Date.now(), name, date, venue: document.getElementById('new-venue').value, blocked: [...blockedSeats], occupied: [] });
+        updateData(); alert("Show Published!");
+    }
+
+    function deleteShow(id) {
+        if(confirm("Delete this show?")) {
+            shows = shows.filter(s => s.id !== id);
+            updateData();
+        }
+    }
+
+    function updateData() {
+        localStorage.setItem('ma_shows', JSON.stringify(shows));
+        renderHome(); renderAdminList();
     }
 
     function renderHome() {
-        const list = document.getElementById('show-list');
-        list.innerHTML = shows.map(s => `
+        document.getElementById('show-list').innerHTML = shows.map(s => `
             <div class="show-card">
-                <h3 style="color:var(--gold);">${s.name}</h3>
-                <p>${s.date} | ${s.venue === 'theater' ? 'Groot Theater' : 'Conference Room'}</p>
-                <button class="btn" onclick="openBooking(${s.id})">RESERVEER STOEL</button>
-            </div>
-        `).join('');
+                <h3>${s.name}</h3>
+                <p>${s.date}</p>
+                <button class="btn" onclick="startBooking(${s.id})">BOOK TICKETS</button>
+            </div>`).join('');
     }
 
-    function openBooking(id) {
+    function renderAdminList() {
+        document.getElementById('admin-show-list').innerHTML = shows.map(s => `
+            <div class="show-card">
+                <h4>${s.name}</h4>
+                <button class="btn btn-red" onclick="deleteShow(${s.id})">DELETE SHOW</button>
+            </div>`).join('');
+    }
+
+    function startBooking(id) {
         currentShow = shows.find(s => s.id === id);
         showPage('booking-login');
     }
 
-    function startSeatSelection() {
-        if (!document.getElementById('user-discord').value || !document.getElementById('user-roblox').value) {
-            return alert("Vul je namen in!");
-        }
+    function openSeating() {
+        if(!document.getElementById('user-discord').value) return alert("Enter Discord info");
         showPage('seating');
-        const container = document.getElementById('chart-render');
-        container.innerHTML = '';
-        renderVenue(currentShow.venue, container, false);
+        renderVenue(currentShow.venue, document.getElementById('chart-render'), false, currentShow);
     }
 
     function confirmBooking() {
-        if (!selectedSeat) return alert("Kies eerst een stoel!");
-
-        const discordName = document.getElementById('user-discord').value;
-        const robloxName = document.getElementById('user-roblox').value;
-
-        // Update lokale status
+        if(!selectedSeat) return alert("Select a seat");
         currentShow.occupied.push(selectedSeat);
-
-        // Discord Webhook
-        const payload = {
-            embeds: [{
-                title: "🎟️ Nieuwe Ticket Reservering",
-                color: 13936439, // Goud kleur
-                fields: [
-                    { name: "Show", value: currentShow.name, inline: true },
-                    { name: "Stoel", value: selectedSeat, inline: true },
-                    { name: "Discord", value: discordName, inline: false },
-                    { name: "Roblox", value: robloxName, inline: false },
-                    { name: "Zaal", value: currentShow.venue }
-                ],
-                footer: { text: "Musical Awards Management" },
-                timestamp: new Date()
-            }]
-        };
-
-        fetch(DISCORD_WEBHOOK, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+        
+        fetch(WEBHOOK, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                embeds: [{
+                    title: "🎟️ NEW TICKET BOOKED", color: 13936439,
+                    fields: [
+                        {name: "Show", value: currentShow.name, inline: true},
+                        {name: "Seat", value: selectedSeat, inline: true},
+                        {name: "Discord", value: document.getElementById('user-discord').value},
+                        {name: "Roblox", value: document.getElementById('user-roblox').value}
+                    ]
+                }]
+            })
         }).then(() => {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#d4af37', '#ffffff'] });
-            alert("Reservering succesvol! Je ticket is verzonden naar Discord.");
-            showPage('home');
-        }).catch(err => {
-            alert("Er was een fout bij het verzenden naar Discord, maar je stoel is lokaal opgeslagen.");
-            showPage('home');
+            confetti({ particleCount: 150, colors: ['#d4af37', '#ffffff'] });
+            alert("Booking Successful!");
+            updateData(); showPage('home');
         });
     }
 
-    // Voorbeeld show
-    shows.push({
-        id: 1,
-        name: "Grand Opening Night",
-        date: "2026-04-28",
-        venue: "theater",
-        blocked: ["Rij 1 - S1", "Rij 1 - S2"],
-        occupied: []
-    });
     renderHome();
-
 </script>
 </body>
 </html>
